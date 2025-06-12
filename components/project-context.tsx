@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 export type Project = {
   id: string
@@ -12,8 +12,20 @@ export type Project = {
   status: "active" | "draft" | "completed" | "archived"
 }
 
-// Updated projects array with one completed project and one blank project
-export const projects: Project[] = [
+type ProjectContextType = {
+  currentProject: Project | null
+  setCurrentProject: (project: Project | null) => void
+  allProjects: Project[]
+  addProject: (project: Project) => void
+  isValidProjectId: (id: string | undefined) => boolean
+  archiveProject: (projectId: string) => void
+  duplicateProject: (projectId: string) => void
+  getArchivedProjects: () => Project[]
+  deleteProject: (projectId: string) => void
+}
+
+// Initial projects array with one completed project and one blank project
+const initialProjects: Project[] = [
   {
     id: "enterprise-satisfaction",
     name: "Enterprise Customer Satisfaction",
@@ -35,22 +47,69 @@ export const projects: Project[] = [
   },
 ]
 
-type ProjectContextType = {
-  currentProject: Project | null
-  setCurrentProject: (project: Project | null) => void
-  allProjects: Project[]
-  isValidProjectId: (id: string | undefined) => boolean
-}
-
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [currentProject, setCurrentProject] = useState<Project | null>(null)
+  const [allProjects, setAllProjects] = useState<Project[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Initialize projects on client-side only
+  useEffect(() => {
+    if (!isInitialized) {
+      setAllProjects(initialProjects)
+      setIsInitialized(true)
+    }
+  }, [isInitialized])
+
+  // Function to add a new project
+  const addProject = (project: Project) => {
+    setAllProjects((prev) => [...prev, project])
+  }
+
+  // Function to archive a project
+  const archiveProject = (projectId: string) => {
+    setAllProjects((prev) =>
+      prev.map((project) =>
+        project.id === projectId ? { ...project, status: "archived" } : project
+      )
+    )
+  }
+
+  // Function to duplicate a project
+  const duplicateProject = (projectId: string) => {
+    const projectToDuplicate = allProjects.find((p) => p.id === projectId)
+    if (projectToDuplicate) {
+      const newProject: Project = {
+        ...projectToDuplicate,
+        id: `${projectToDuplicate.id}-copy-${Date.now()}`,
+        name: `${projectToDuplicate.name} (Copy)`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: "draft",
+        progress: 0,
+      }
+      addProject(newProject)
+    }
+  }
+
+  // Function to get archived projects
+  const getArchivedProjects = () => {
+    return allProjects.filter((project) => project.status === "archived")
+  }
+
+  // Function to delete a project
+  const deleteProject = (projectId: string) => {
+    setAllProjects((prev) => prev.filter((project) => project.id !== projectId))
+    if (currentProject?.id === projectId) {
+      setCurrentProject(null)
+    }
+  }
 
   // Function to check if a project ID is valid
   const isValidProjectId = (id: string | undefined): boolean => {
     if (!id || id === "undefined") return false
-    return projects.some((project) => project.id === id)
+    return allProjects.some((project) => project.id === id)
   }
 
   return (
@@ -58,8 +117,13 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       value={{
         currentProject,
         setCurrentProject,
-        allProjects: projects,
+        allProjects,
+        addProject,
         isValidProjectId,
+        archiveProject,
+        duplicateProject,
+        getArchivedProjects,
+        deleteProject,
       }}
     >
       {children}
