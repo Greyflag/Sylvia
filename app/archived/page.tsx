@@ -26,6 +26,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+// Add date formatting utility
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
 export default function ArchivedProjectsPage() {
   const { getArchivedProjects, deleteProject } = useProject()
   const [archivedProjects, setArchivedProjects] = useState<ReturnType<typeof getArchivedProjects>>([])
@@ -107,7 +117,7 @@ export default function ArchivedProjectsPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2 text-lg">{project.name}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Last updated: {new Date(project.updatedAt).toLocaleDateString()}
+                    Last updated: {formatDate(project.updatedAt)}
                   </p>
                 </div>
                 <DropdownMenu>
@@ -135,14 +145,24 @@ export default function ArchivedProjectsPage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                    Archived
+                  <div
+                    className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                      project.status === "active"
+                        ? "bg-green-100 text-green-800"
+                        : project.status === "draft"
+                          ? "bg-gray-100 text-gray-800"
+                          : project.status === "completed"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-amber-100 text-amber-800"
+                    }`}
+                  >
+                    {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                    Created: {formatDate(project.createdAt)}
                   </div>
                 </div>
-                <p className="text-sm mb-3">{project.description}</p>
+                <p className="text-sm mb-3 line-clamp-2">{project.description}</p>
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Progress</span>

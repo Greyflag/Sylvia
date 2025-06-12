@@ -27,6 +27,16 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
 
+// Add date formatting utility
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
 export default function ProjectsDashboard() {
   const { allProjects, archiveProject, duplicateProject } = useProject()
   const router = useRouter()
@@ -145,86 +155,99 @@ export default function ProjectsDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {allProjects
-          .filter((project) => project.status !== "archived")
-          .map((project) => (
-            <Card key={project.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex justify-between items-start pb-2">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-lg">{project.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Last updated: {new Date(project.updatedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                      <span className="sr-only">Project menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/projects/${project.id}`}>View Project</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>
-                      Duplicate Project
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>Export Data</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-red-600"
-                      onClick={() => handleArchiveProject(project.id)}
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {allProjects
+            .filter((project) => project.status !== "archived")
+            .map((project) => (
+              <Card key={project.id} className="hover:shadow-md transition-shadow flex flex-col">
+                <CardHeader className="flex justify-between items-start pb-2">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">{project.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Last updated: {formatDate(project.updatedAt)}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Project menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/projects/${project.id}`}>View Project</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>
+                        Duplicate Project
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>Export Data</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => handleArchiveProject(project.id)}
+                      >
+                        Archive Project
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent className="pb-3 flex-grow">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        project.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : project.status === "draft"
+                            ? "bg-gray-100 text-gray-800"
+                            : project.status === "completed"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-amber-100 text-amber-800"
+                      }`}
                     >
-                      Archive Project
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <div
-                    className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                      project.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : project.status === "draft"
-                          ? "bg-gray-100 text-gray-800"
-                          : project.status === "completed"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-amber-100 text-amber-800"
-                    }`}
-                  >
-                    {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Created: {formatDate(project.createdAt)}
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                  <p className="text-sm mb-3 line-clamp-2 h-10">{project.description}</p>
+                  <div className="space-y-1 mt-auto">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="font-medium">{project.progress}%</span>
+                    </div>
+                    <Progress
+                      value={project.progress}
+                      className="h-2 bg-gray-200"
+                      indicatorClassName="bg-sylvia-600"
+                    />
                   </div>
-                </div>
-                <p className="text-sm mb-3">{project.description}</p>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-medium">{project.progress}%</span>
-                  </div>
-                  <Progress
-                    value={project.progress}
-                    className="h-2"
-                    indicatorClassName={`${
-                      project.status === "active"
-                        ? "bg-sylvia-600"
-                        : project.status === "draft"
-                          ? "bg-gray-400"
-                          : project.status === "completed"
-                            ? "bg-blue-500"
-                            : "bg-amber-500"
-                    }`}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+                <CardFooter className="pt-0">
+                  {project.progress === 0 ? (
+                    <Button 
+                      className="w-full bg-sylvia-600 hover:bg-sylvia-700"
+                      onClick={() => router.push(`/projects/${project.id}`)}
+                    >
+                      Start Project
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => router.push(`/projects/${project.id}`)}
+                    >
+                      View Project
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            ))}
+        </div>
       </div>
     </div>
   )
