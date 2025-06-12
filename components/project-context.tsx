@@ -51,16 +51,7 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [currentProject, setCurrentProject] = useState<Project | null>(null)
-  const [allProjects, setAllProjects] = useState<Project[]>([])
-  const [isInitialized, setIsInitialized] = useState(false)
-
-  // Initialize projects on client-side only
-  useEffect(() => {
-    if (!isInitialized) {
-      setAllProjects(initialProjects)
-      setIsInitialized(true)
-    }
-  }, [isInitialized])
+  const [allProjects, setAllProjects] = useState<Project[]>(initialProjects)
 
   // Function to add a new project
   const addProject = (project: Project) => {
