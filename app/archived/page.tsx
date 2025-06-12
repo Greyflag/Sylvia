@@ -26,6 +26,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
+// Add date formatting utility
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
 export default function ArchivedProjectsPage() {
   const { getArchivedProjects, deleteProject } = useProject()
   const [archivedProjects, setArchivedProjects] = useState<ReturnType<typeof getArchivedProjects>>([])
@@ -107,7 +117,7 @@ export default function ArchivedProjectsPage() {
                 <div>
                   <CardTitle className="flex items-center gap-2 text-lg">{project.name}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Last updated: {new Date(project.updatedAt).toLocaleDateString()}
+                    Last updated: {formatDate(project.updatedAt)}
                   </p>
                 </div>
                 <DropdownMenu>
@@ -149,7 +159,7 @@ export default function ArchivedProjectsPage() {
                     {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                    Created: {formatDate(project.createdAt)}
                   </div>
                 </div>
                 <p className="text-sm mb-3 line-clamp-2">{project.description}</p>

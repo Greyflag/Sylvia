@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,32 +10,45 @@ import { Textarea } from "@/components/ui/textarea"
 import { useProject } from "@/components/project-context"
 import { v4 as uuidv4 } from "uuid"
 
+// Add date formatting utility
+const formatDate = (date: Date) => {
+  return date.toISOString()
+}
+
 export default function NewProjectPage() {
   const router = useRouter()
   const { addProject, setCurrentProject } = useProject()
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
 
-    // Create a new project with a unique ID
-    const newProject = {
-      id: uuidv4(),
-      name,
-      description,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      progress: 0,
-      status: "draft" as const,
+    try {
+      // Create a new project with a unique ID
+      const now = new Date()
+      const newProject = {
+        id: uuidv4(),
+        name,
+        description,
+        createdAt: formatDate(now),
+        updatedAt: formatDate(now),
+        progress: 0,
+        status: "draft" as const,
+      }
+
+      // Add the new project using the context function
+      addProject(newProject)
+      setCurrentProject(newProject)
+
+      // Redirect to the new project
+      router.push(`/projects/${newProject.id}`)
+    } catch (error) {
+      console.error('Error creating project:', error)
+      setIsSubmitting(false)
     }
-
-    // Add the new project using the context function
-    addProject(newProject)
-    setCurrentProject(newProject)
-
-    // Redirect to the new project
-    router.push(`/projects/${newProject.id}`)
   }
 
   return (
@@ -55,6 +68,7 @@ export default function NewProjectPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
             <div className="space-y-2">
@@ -65,10 +79,15 @@ export default function NewProjectPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
-            <Button type="submit" className="w-full bg-sylvia-600 hover:bg-sylvia-700">
-              Create Project
+            <Button 
+              type="submit" 
+              className="w-full bg-sylvia-600 hover:bg-sylvia-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating Project...' : 'Create Project'}
             </Button>
           </form>
         </CardContent>

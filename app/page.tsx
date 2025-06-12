@@ -222,16 +222,8 @@ export default function ProjectsDashboard() {
                     </div>
                     <Progress
                       value={project.progress}
-                      className="h-2"
-                      indicatorClassName={`${
-                        project.status === "active"
-                          ? "bg-sylvia-600"
-                          : project.status === "draft"
-                            ? "bg-gray-400"
-                            : project.status === "completed"
-                              ? "bg-blue-500"
-                              : "bg-amber-500"
-                      }`}
+                      className="h-2 bg-gray-200"
+                      indicatorClassName="bg-sylvia-600"
                     />
                   </div>
                 </CardContent>

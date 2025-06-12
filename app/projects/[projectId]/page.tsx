@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -45,18 +45,34 @@ export default function ProjectDashboard() {
   const params = useParams()
   const projectId = params.projectId as string
   const { currentProject, setCurrentProject } = useProject()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [projectData, setProjectData] = useState({
+    analytics: null,
+    contacts: [],
+    questions: [],
+    objectives: []
+  })
 
-  // Get project data
-  const analytics = getProjectAnalytics(projectId)
-  const contacts = getProjectContacts(projectId)
-  const questions = getProjectQuestionSet(projectId)
-  const objectives = getProjectObjectives(projectId)
+  useEffect(() => {
+    // Fetch project data
+    const analytics = getProjectAnalytics(projectId)
+    const contacts = getProjectContacts(projectId)
+    const questions = getProjectQuestionSet(projectId)
+    const objectives = getProjectObjectives(projectId)
+
+    setProjectData({
+      analytics,
+      contacts,
+      questions,
+      objectives
+    })
+    setIsLoading(false)
+  }, [projectId])
 
   // Check if this is the completed project
   const isCompleted = currentProject?.status === "completed"
 
-  if (!currentProject) {
+  if (!currentProject || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -66,6 +82,8 @@ export default function ProjectDashboard() {
       </div>
     )
   }
+
+  const { analytics, contacts, questions, objectives } = projectData
 
   return (
     <div className="space-y-6">
