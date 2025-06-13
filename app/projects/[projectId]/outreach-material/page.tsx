@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Copy, Edit, FileText, Mail, MessageSquare, Save, Zap, Sparkles } from "lucide-react"
+import { CheckCircle, Copy, Edit, FileText, Mail, MessageSquare, Save, Zap, Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Link from "next/link"
 
 export default function OutreachMaterialPage() {
   const params = useParams()
@@ -79,9 +80,16 @@ The Customer Success Team`
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Outreach Material</h1>
-          <p className="text-muted-foreground mt-1">Create and customize your survey invitation emails</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/projects/${projectId}`}>
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Outreach Material</h1>
+            <p className="text-muted-foreground mt-1">Create and customize your survey invitation emails</p>
+          </div>
         </div>
         <div className="flex gap-2">
           {!isCompleted && (
@@ -209,6 +217,19 @@ The Customer Success Team`
             <Copy className="mr-2 h-4 w-4" />
             Copy Templates
           </Button>
+          {!isCompleted && (
+            <>
+              <div className="flex gap-2">
+                <Button variant="outline">Save Draft</Button>
+                <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
+                  <Link href={`/projects/${projectId}/outreach-campaign`}>
+                    Continue
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

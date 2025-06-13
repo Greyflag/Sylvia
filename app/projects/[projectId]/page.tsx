@@ -17,6 +17,11 @@ import {
   Zap,
   Database,
   Upload,
+  Globe,
+  Search,
+  Brain,
+  Loader2,
+  Sparkles,
 } from "lucide-react"
 import { useProject } from "@/components/project-context"
 import {
@@ -52,6 +57,10 @@ export default function ProjectDashboard() {
     questions: [],
     objectives: []
   })
+  const [isAILoading, setIsAILoading] = useState(false)
+  const [aiLoadingStep, setAILoadingStep] = useState(0)
+  const [isAutoGenerateOpen, setIsAutoGenerateOpen] = useState(false)
+  const [autoGenerateInput, setAutoGenerateInput] = useState("")
 
   useEffect(() => {
     // Fetch project data
@@ -84,6 +93,54 @@ export default function ProjectDashboard() {
   }
 
   const { analytics, contacts, questions, objectives } = projectData
+
+  const handleAIGenerate = () => {
+    setIsAutoGenerateOpen(false)
+    setIsAILoading(true)
+    setAILoadingStep(0)
+    // Animation steps
+    const steps = [
+      "Scouring the web for the latest research...",
+      "Analyzing articles and extracting insights...",
+      "Synthesizing survey questions...",
+      "Finalizing your custom question set..."
+    ]
+    let step = 0
+    const interval = setInterval(() => {
+      setAILoadingStep((prev) => {
+        if (prev < steps.length - 1) {
+          return prev + 1
+        }
+        return prev
+      })
+      step++
+      if (step >= steps.length) {
+        clearInterval(interval)
+      }
+    }, 2500)
+    setTimeout(() => {
+      setIsAILoading(false)
+      setAILoadingStep(0)
+      // Add the provided question objects
+      const newQuestions = [
+        // --- BEGIN provided question objects ---
+        {
+          id: "intro-1",
+          text: "Thank you for taking our survey! We are always looking to improve our customer experience in an effort to better support organizations like yours. To that end, we are hoping to collect feedback from former customers like you to help inform our approach. We expect this survey will take 10-15 minutes to complete. Please answer as candidly and transparently as possible—we want to hear the 'hard truth' so we can improve! (Incentive information will be provided at the end of the survey.) To begin, please enter the email address this survey invitation was sent to—this will help ensure you don't receive repeat requests to participate.",
+          type: "open-ended",
+          section: "Introduction + Screeners",
+          required: true,
+          options: [],
+        },
+        // ... rest of the questions ...
+      ]
+      setProjectData(prev => ({
+        ...prev,
+        questions: newQuestions
+      }))
+      setAutoGenerateInput("")
+    }, 10000)
+  }
 
   return (
     <div className="space-y-6">
@@ -197,7 +254,13 @@ export default function ProjectDashboard() {
             <CardDescription>Get AI-powered insights and suggestions</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">Generate Questions</Button>
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              onClick={() => setIsAutoGenerateOpen(true)}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate Questions
+            </Button>
           </CardContent>
         </Card>
 
@@ -545,6 +608,59 @@ export default function ProjectDashboard() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      <Dialog open={isAutoGenerateOpen} onOpenChange={setIsAutoGenerateOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Auto-Generate Questions</DialogTitle>
+            <DialogDescription>
+              Enter keywords, ideas, or goals for the questions you want to generate. (e.g. onboarding, product feedback, customer satisfaction)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Textarea
+              value={autoGenerateInput}
+              onChange={e => setAutoGenerateInput(e.target.value)}
+              placeholder="Type your keywords, ideas, or goals here..."
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAutoGenerateOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAIGenerate}>
+              Generate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {isAILoading && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-6 min-w-[340px] max-w-[90vw]">
+            <div className="flex gap-4 text-sylvia-600 animate-pulse">
+              <Globe className="h-8 w-8 animate-spin-slow" />
+              <Search className="h-8 w-8 animate-bounce" />
+              <FileText className="h-8 w-8 animate-pulse" />
+              <Brain className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+            <div className="text-lg font-semibold text-sylvia-700 text-center min-h-[48px]">
+              {[
+                "Scouring the web for the latest research...",
+                "Analyzing articles and extracting insights...",
+                "Synthesizing survey questions...",
+                "Finalizing your custom question set..."
+              ][aiLoadingStep]}
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-sylvia-600 h-2 rounded-full transition-all duration-500" style={{ width: `${(aiLoadingStep + 1) * 25}%` }} />
+            </div>
+            <div className="text-xs text-gray-400 mt-2">Sylvia AI is researching and generating your questions...</div>
+          </div>
+        </div>
       )}
     </div>
   )

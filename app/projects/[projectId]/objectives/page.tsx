@@ -37,14 +37,76 @@ import {
   Zap,
   Upload,
   Mic,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
+import Link from "next/link"
 
 export default function ObjectivesPage() {
+  const [objectives, setObjectives] = useState([])
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [activeTab, setActiveTab] = useState("objectives")
+  const [newObjective, setNewObjective] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    dueDate: "",
+  })
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingObjective, setEditingObjective] = useState(null)
+  const [documents, setDocuments] = useState([
+    {
+      id: "1",
+      name: "Project Kickoff Call Transcript",
+      type: "Kickoff Transcript",
+      date: "Nov 20, 2023",
+      size: "2.3 MB",
+      description: "Complete transcript from the initial project kickoff call with stakeholders",
+      badge: "transcript",
+      icon: Mic,
+    },
+    {
+      id: "2",
+      name: "Annual Report 2023",
+      type: "Company Report",
+      date: "Mar 15, 2023",
+      size: "5.2 MB",
+      description: "Financial performance and highlights",
+      badge: "pdf",
+      icon: FileText,
+    },
+    {
+      id: "3",
+      name: "Product Roadmap",
+      type: "Product Specification",
+      date: "Jan 5, 2023",
+      size: "1.8 MB",
+      description: "Upcoming features and development plans",
+      badge: "xlsx",
+      icon: FileText,
+    },
+    {
+      id: "4",
+      name: "Previous Customer Survey",
+      type: "Customer Feedback",
+      date: "Nov 12, 2022",
+      size: "3.1 MB",
+      description: "Results from last year's customer feedback",
+      badge: "pptx",
+      icon: FileText,
+    },
+  ])
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+  const [newDocument, setNewDocument] = useState({
+    type: "",
+    title: "",
+    description: "",
+    file: null,
+  })
   const params = useParams()
   const searchParams = useSearchParams()
   const projectId = params.projectId as string
   const { currentProject } = useProject()
-  const [activeTab, setActiveTab] = useState("objectives")
 
   // Check for tab parameter from URL
   useEffect(() => {
@@ -54,11 +116,153 @@ export default function ObjectivesPage() {
     }
   }, [searchParams])
 
-  // Get objectives for this project
-  const objectives = getProjectObjectives(projectId)
+  useEffect(() => {
+    const fetchObjectives = async () => {
+      const projectObjectives = getProjectObjectives(projectId)
+      setObjectives(projectObjectives)
+    }
+    fetchObjectives()
+  }, [projectId])
+
+  const handleEditObjective = (objective) => {
+    setEditingObjective(objective)
+    setNewObjective({
+      title: objective.title,
+      description: objective.description,
+      priority: objective.priority,
+      dueDate: objective.dueDate,
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleDeleteObjective = (objectiveId) => {
+    setObjectives(objectives.filter(obj => obj.id !== objectiveId))
+  }
+
+  const handleAddObjective = () => {
+    setEditingObjective(null)
+    setNewObjective({
+      title: "",
+      description: "",
+      priority: "medium",
+      dueDate: "",
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleSaveObjective = (e) => {
+    e.preventDefault() // Prevent form submission
+    if (editingObjective) {
+      // Update existing objective
+      setObjectives(objectives.map(obj => 
+        obj.id === editingObjective.id 
+          ? { ...newObjective, id: obj.id, status: obj.status }
+          : obj
+      ))
+      setEditingObjective(null)
+    } else {
+      // Create new objective
+      const newObjectiveWithId = {
+        ...newObjective,
+        id: (objectives.length + 1).toString(),
+        status: "in-progress",
+      }
+      setObjectives([...objectives, newObjectiveWithId])
+    }
+    
+    setNewObjective({
+      title: "",
+      description: "",
+      priority: "medium",
+      dueDate: "",
+    })
+    setIsDialogOpen(false)
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setEditingObjective(null)
+    setNewObjective({
+      title: "",
+      description: "",
+      priority: "medium",
+      dueDate: "",
+    })
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setNewObjective(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleDocumentInputChange = (field: string, value: string) => {
+    setNewDocument(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setNewDocument(prev => ({
+        ...prev,
+        file
+      }))
+    }
+  }
+
+  const getFileSize = (bytes: number) => {
+    const mb = bytes / (1024 * 1024)
+    return `${mb.toFixed(1)} MB`
+  }
+
+  const getBadgeType = (type: string) => {
+    switch (type) {
+      case "Kickoff Transcript":
+        return "transcript"
+      case "Company Report":
+        return "pdf"
+      case "Product Specification":
+        return "xlsx"
+      case "Customer Feedback":
+        return "pptx"
+      default:
+        return "pdf"
+    }
+  }
+
+  const handleUploadDocument = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newDocument.file) return
+
+    const newDoc = {
+      id: (documents.length + 1).toString(),
+      name: newDocument.title,
+      type: newDocument.type,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      size: getFileSize(newDocument.file.size),
+      description: newDocument.description,
+      badge: getBadgeType(newDocument.type),
+      icon: newDocument.type === "Kickoff Transcript" ? Mic : FileText,
+    }
+
+    setDocuments([...documents, newDoc])
+    setNewDocument({
+      type: "",
+      title: "",
+      description: "",
+      file: null,
+    })
+    setIsUploadDialogOpen(false)
+  }
 
   // Check if this is the completed project
-  const isCompleted = currentProject?.status === "completed"
+  useEffect(() => {
+    setIsCompleted(currentProject?.status === "completed")
+  }, [currentProject])
 
   // Sample client data for the Knowledge Base
   const clientData = {
@@ -105,163 +309,31 @@ export default function ObjectivesPage() {
     },
   }
 
-  // Sample documents with kickoff transcript
-  const documents = [
-    {
-      id: "1",
-      name: "Project Kickoff Call Transcript",
-      type: "Kickoff Transcript",
-      date: "Nov 20, 2023",
-      size: "2.3 MB",
-      description: "Complete transcript from the initial project kickoff call with stakeholders",
-      badge: "transcript",
-      icon: Mic,
-    },
-    {
-      id: "2",
-      name: "Annual Report 2023",
-      type: "Company Report",
-      date: "Mar 15, 2023",
-      size: "5.2 MB",
-      description: "Financial performance and highlights",
-      badge: "pdf",
-      icon: FileText,
-    },
-    {
-      id: "3",
-      name: "Product Roadmap",
-      type: "Product Specification",
-      date: "Jan 5, 2023",
-      size: "1.8 MB",
-      description: "Upcoming features and development plans",
-      badge: "xlsx",
-      icon: FileText,
-    },
-    {
-      id: "4",
-      name: "Previous Customer Survey",
-      type: "Customer Feedback",
-      date: "Nov 12, 2022",
-      size: "3.1 MB",
-      description: "Results from last year's customer feedback",
-      badge: "pptx",
-      icon: FileText,
-    },
-  ]
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Define Objectives</h1>
-          <p className="text-muted-foreground mt-1">Set clear research goals for your VOC project</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/projects/${projectId}`}>
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Define Objectives</h1>
+            <p className="text-muted-foreground mt-1">Set clear research goals and KPIs</p>
+          </div>
         </div>
         <div className="flex gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="bg-white">
-                <Calendar className="mr-2 h-4 w-4" />
-                Schedule Meeting with Consultant
+          {!isCompleted && (
+            <>
+              <Button variant="outline">Save Draft</Button>
+              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
+                <Link href={`/projects/${projectId}/question-set`}>
+                  Continue
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Schedule a Consultation</DialogTitle>
-                <DialogDescription>
-                  Book a meeting with our VOC consultant to help define your research objectives.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Your Name</Label>
-                  <Input id="name" placeholder="Enter your name" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="Enter your email" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date">Preferred Date</Label>
-                  <Input id="date" type="date" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="time">Preferred Time</Label>
-                  <Select>
-                    <SelectTrigger id="time">
-                      <SelectValue placeholder="Select time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="9am">9:00 AM</SelectItem>
-                      <SelectItem value="10am">10:00 AM</SelectItem>
-                      <SelectItem value="11am">11:00 AM</SelectItem>
-                      <SelectItem value="1pm">1:00 PM</SelectItem>
-                      <SelectItem value="2pm">2:00 PM</SelectItem>
-                      <SelectItem value="3pm">3:00 PM</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Additional Notes</Label>
-                  <Textarea id="notes" placeholder="Any specific topics you'd like to discuss?" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700">
-                  Schedule Meeting
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          {!isCompleted && activeTab === "objectives" && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-sylvia-600 hover:bg-sylvia-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Objective
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Objective</DialogTitle>
-                  <DialogDescription>Define a clear research objective for your VOC project.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Objective Title</Label>
-                    <Input id="title" placeholder="e.g., Understand Customer Satisfaction" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" placeholder="Describe what you want to achieve..." />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="priority">Priority</Label>
-                      <Select defaultValue="medium">
-                        <SelectTrigger id="priority">
-                          <SelectValue placeholder="Select priority" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="low">Low</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dueDate">Due Date</Label>
-                      <Input id="dueDate" type="date" />
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700">
-                    Save Objective
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </>
           )}
         </div>
       </div>
@@ -386,10 +458,18 @@ export default function ObjectivesPage() {
                         </TableCell>
                         {!isCompleted && (
                           <TableCell className="text-right">
-                            <Button variant="ghost" size="icon">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEditObjective(objective)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleDeleteObjective(objective.id)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </TableCell>
@@ -404,54 +484,88 @@ export default function ObjectivesPage() {
                   <h3 className="text-lg font-medium mb-2">No objectives defined yet</h3>
                   <p className="mb-4">Start by defining your research objectives to guide your VOC project.</p>
                   {!isCompleted && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button className="bg-sylvia-600 hover:bg-sylvia-700">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Add Your First Objective
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                          <DialogTitle>Add New Objective</DialogTitle>
-                          <DialogDescription>Define a clear research objective for your VOC project.</DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="title">Objective Title</Label>
-                            <Input id="title" placeholder="e.g., Understand Customer Satisfaction" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea id="description" placeholder="Describe what you want to achieve..." />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="priority">Priority</Label>
-                              <Select defaultValue="medium">
-                                <SelectTrigger id="priority">
-                                  <SelectValue placeholder="Select priority" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="high">High</SelectItem>
-                                  <SelectItem value="medium">Medium</SelectItem>
-                                  <SelectItem value="low">Low</SelectItem>
-                                </SelectContent>
-                              </Select>
+                    <>
+                      <Button 
+                        className="bg-sylvia-600 hover:bg-sylvia-700"
+                        onClick={handleAddObjective}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Your First Objective
+                      </Button>
+                      <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+                        <DialogContent className="sm:max-w-[600px]">
+                          <form onSubmit={handleSaveObjective}>
+                            <DialogHeader>
+                              <DialogTitle>{editingObjective ? 'Edit Objective' : 'Add New Objective'}</DialogTitle>
+                              <DialogDescription>
+                                {editingObjective 
+                                  ? 'Update the research objective for your VOC project.'
+                                  : 'Define a clear research objective for your VOC project.'}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="title">Objective Title</Label>
+                                <Input 
+                                  id="title" 
+                                  placeholder="e.g., Understand Customer Satisfaction"
+                                  value={newObjective.title}
+                                  onChange={(e) => handleInputChange("title", e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="description">Description</Label>
+                                <Textarea 
+                                  id="description" 
+                                  placeholder="Describe what you want to achieve..."
+                                  value={newObjective.description}
+                                  onChange={(e) => handleInputChange("description", e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="priority">Priority</Label>
+                                  <Select 
+                                    defaultValue="medium"
+                                    value={newObjective.priority}
+                                    onValueChange={(value) => handleInputChange("priority", value)}
+                                  >
+                                    <SelectTrigger id="priority">
+                                      <SelectValue placeholder="Select priority" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="high">High</SelectItem>
+                                      <SelectItem value="medium">Medium</SelectItem>
+                                      <SelectItem value="low">Low</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="dueDate">Due Date</Label>
+                                  <Input 
+                                    id="dueDate" 
+                                    type="date"
+                                    value={newObjective.dueDate}
+                                    onChange={(e) => handleInputChange("dueDate", e.target.value)}
+                                    required
+                                  />
+                                </div>
+                              </div>
                             </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="dueDate">Due Date</Label>
-                              <Input id="dueDate" type="date" />
-                            </div>
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700">
-                            Save Objective
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                            <DialogFooter>
+                              <Button 
+                                type="submit" 
+                                className="bg-sylvia-600 hover:bg-sylvia-700"
+                              >
+                                Save Objective
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                    </>
                   )}
                 </div>
               )}
@@ -467,7 +581,7 @@ export default function ObjectivesPage() {
                   <Database className="h-5 w-5" />
                   <h2 className="text-lg font-medium">Client Knowledge Base</h2>
                 </div>
-                <Dialog>
+                <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
                   <DialogTrigger asChild>
                     <Button className="bg-sylvia-600 hover:bg-sylvia-700">
                       <Upload className="mr-2 h-4 w-4" />
@@ -475,58 +589,86 @@ export default function ObjectivesPage() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                      <DialogTitle>Upload Document</DialogTitle>
-                      <DialogDescription>
-                        Add documents to your project's knowledge base for better context and insights.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="document-type">Document Type</Label>
-                        <Select>
-                          <SelectTrigger id="document-type">
-                            <SelectValue placeholder="Select document type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="kickoff-transcript">Kickoff Call Transcript</SelectItem>
-                            <SelectItem value="company-report">Company Report</SelectItem>
-                            <SelectItem value="product-spec">Product Specification</SelectItem>
-                            <SelectItem value="customer-feedback">Customer Feedback</SelectItem>
-                            <SelectItem value="market-research">Market Research</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="document-title">Document Title</Label>
-                        <Input id="document-title" placeholder="Enter document title" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="document-description">Description (Optional)</Label>
-                        <Textarea id="document-description" placeholder="Brief description of the document" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="file-upload">Upload File</Label>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                          <p className="text-sm text-gray-600 mb-2">Drag and drop your file here, or click to browse</p>
-                          <Input id="file-upload" type="file" className="hidden" />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => document.getElementById("file-upload")?.click()}
+                    <form onSubmit={handleUploadDocument}>
+                      <DialogHeader>
+                        <DialogTitle>Upload Document</DialogTitle>
+                        <DialogDescription>
+                          Add documents to your project's knowledge base for better context and insights.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="document-type">Document Type</Label>
+                          <Select
+                            value={newDocument.type}
+                            onValueChange={(value) => handleDocumentInputChange("type", value)}
                           >
-                            Choose File
-                          </Button>
+                            <SelectTrigger id="document-type">
+                              <SelectValue placeholder="Select document type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Kickoff Transcript">Kickoff Call Transcript</SelectItem>
+                              <SelectItem value="Company Report">Company Report</SelectItem>
+                              <SelectItem value="Product Specification">Product Specification</SelectItem>
+                              <SelectItem value="Customer Feedback">Customer Feedback</SelectItem>
+                              <SelectItem value="Market Research">Market Research</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="document-title">Document Title</Label>
+                          <Input 
+                            id="document-title" 
+                            placeholder="Enter document title"
+                            value={newDocument.title}
+                            onChange={(e) => handleDocumentInputChange("title", e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="document-description">Description (Optional)</Label>
+                          <Textarea 
+                            id="document-description" 
+                            placeholder="Brief description of the document"
+                            value={newDocument.description}
+                            onChange={(e) => handleDocumentInputChange("description", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="file-upload">Upload File</Label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                            <p className="text-sm text-gray-600 mb-2">
+                              {newDocument.file ? newDocument.file.name : "Drag and drop your file here, or click to browse"}
+                            </p>
+                            <Input 
+                              id="file-upload" 
+                              type="file" 
+                              className="hidden" 
+                              onChange={handleFileChange}
+                              required
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => document.getElementById("file-upload")?.click()}
+                            >
+                              Choose File
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700">
-                        Upload Document
-                      </Button>
-                    </DialogFooter>
+                      <DialogFooter>
+                        <Button 
+                          type="submit" 
+                          className="bg-sylvia-600 hover:bg-sylvia-700"
+                          disabled={!newDocument.file || !newDocument.title || !newDocument.type}
+                        >
+                          Upload Document
+                        </Button>
+                      </DialogFooter>
+                    </form>
                   </DialogContent>
                 </Dialog>
               </div>

@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { CheckCircle, Download, MoreHorizontal, Plus, Upload, Zap } from "lucide-react"
+import { CheckCircle, Download, MoreHorizontal, Plus, Upload, Zap, ChevronLeft, ChevronRight } from "lucide-react"
+import Link from "next/link"
 
 export default function ContactsPage() {
   const params = useParams()
@@ -50,9 +51,16 @@ export default function ContactsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Contact List</h1>
-          <p className="text-muted-foreground mt-1">Manage your survey recipients</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/projects/${projectId}`}>
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Contact List</h1>
+            <p className="text-muted-foreground mt-1">Manage your survey recipients</p>
+          </div>
         </div>
         <div className="flex gap-2">
           {!isCompleted && (
@@ -217,6 +225,13 @@ export default function ContactsPage() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              <Button variant="outline">Save Draft</Button>
+              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
+                <Link href={`/projects/${projectId}/outreach-material`}>
+                  Continue
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </>
           )}
           <Button variant="outline">

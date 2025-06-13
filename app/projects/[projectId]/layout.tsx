@@ -27,7 +27,7 @@ export default function ProjectLayout({
   if (isLoading) {
     return (
       <div className="flex h-screen">
-        <Sidebar />
+        <Sidebar projectId={projectId} project={allProjects.find((p) => p.id === projectId)} />
         <main className="flex-1 p-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
@@ -41,7 +41,7 @@ export default function ProjectLayout({
 
   return (
     <div className="flex h-screen">
-      <Sidebar />
+      <Sidebar projectId={projectId} project={allProjects.find((p) => p.id === projectId)} />
       <main className="flex-1 p-8">{children}</main>
     </div>
   )

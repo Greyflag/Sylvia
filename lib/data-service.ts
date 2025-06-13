@@ -192,6 +192,9 @@ const emptyContacts: any[] = []
 const emptyQuestions: any[] = []
 const emptyResponses: any[] = []
 
+// Store for draft project questions
+let draftQuestions: any[] = []
+
 export function getProjectContacts(projectId: string) {
   if (projectId === "enterprise-satisfaction") {
     return enterpriseContacts
@@ -200,10 +203,7 @@ export function getProjectContacts(projectId: string) {
 }
 
 export function getProjectQuestionSet(projectId: string) {
-  if (projectId === "enterprise-satisfaction") {
-    return enterpriseQuestions
-  }
-  return emptyQuestions
+  return draftQuestions;
 }
 
 export function getProjectResponses(projectId: string) {
@@ -275,4 +275,20 @@ export function getProjectAnalytics(projectId: string) {
 export function getResponseById(projectId: string, responseId: string) {
   const responses = getProjectResponses(projectId)
   return responses.find((response) => response.id === responseId)
+}
+
+export function createQuestion(projectId: string, question: any) {
+  if (projectId === "enterprise-satisfaction") {
+    return // Don't modify the completed project
+  }
+  draftQuestions.push(question)
+  return question
+}
+
+export function updateProject(projectId: string, project: any) {
+  if (projectId === "enterprise-satisfaction") {
+    return // Don't modify the completed project
+  }
+  // In a real app, this would update the project in the database
+  return project
 }
