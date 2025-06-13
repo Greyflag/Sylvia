@@ -27,6 +27,8 @@ import {
   Sparkles,
   Brain,
   Target,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -50,6 +52,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Link from "next/link"
 
 export default function AnalyticsPage() {
   const params = useParams()
@@ -304,20 +307,26 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Analytics & Reporting</h1>
-          <p className="text-muted-foreground mt-1">View insights and generate reports from your survey data</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/projects/${projectId}`}>
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Analytics & Reporting</h1>
+            <p className="text-muted-foreground mt-1">View and analyze your survey results</p>
+          </div>
         </div>
         <div className="flex gap-2">
-          {isCompleted && (
+          {!isCompleted && (
             <>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export Data
-              </Button>
-              <Button className="bg-sylvia-600 hover:bg-sylvia-700">
-                <FileText className="mr-2 h-4 w-4" />
-                Generate Report
+              <Button variant="outline">Save Draft</Button>
+              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
+                <Link href={`/projects/${projectId}`}>
+                  Back to Project
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </>
           )}

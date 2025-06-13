@@ -44,14 +44,14 @@ export default function OutreachCampaignPage() {
     }
   }, [projectId])
 
-  // Add after the useEffect hook
-  const isCampaignLaunched = projectId === "enterprise-satisfaction"
-  const campaignStatus = isCampaignLaunched ? "active" : "draft"
-
   // If current project isn't loaded yet, show a loading state
   if (!currentProject) {
     return <div>Loading project...</div>
   }
+
+  // Add after the loading check
+  const isCampaignLaunched = projectId === "enterprise-satisfaction"
+  const campaignStatus = isCampaignLaunched ? "active" : "draft"
 
   // Calculate campaign stats
   const completedResponses = responders.filter((r) => r.status === "completed").length
@@ -64,14 +64,21 @@ export default function OutreachCampaignPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-4">
-            <div className="bg-sylvia-600 text-white w-10 h-10 rounded-lg flex items-center justify-center">
-              <Zap className="h-5 w-5" />
-            </div>
-            Outreach Campaign
-          </h1>
-          <p className="text-muted-foreground mt-2">Schedule, launch and monitor your survey outreach campaign.</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/projects/${projectId}`}>
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-4">
+              <div className="bg-sylvia-600 text-white w-10 h-10 rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5" />
+              </div>
+              Outreach Campaign
+            </h1>
+            <p className="text-muted-foreground mt-2">Schedule, launch and monitor your survey outreach campaign.</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">Save Draft</Button>

@@ -67,7 +67,7 @@ export function Sidebar({ className, projectId, project }: SidebarProps) {
   ]
 
   return (
-    <div className={cn("pb-12 border-r bg-white/80 backdrop-blur-sm", className)}>
+    <div className={cn("w-60 min-h-screen pb-12 border-r bg-white/80 backdrop-blur-sm", className)}>
       <div className="space-y-4 py-4">
         <div className="px-4 py-2">
           <Link href="/" className="flex items-center mb-6">
