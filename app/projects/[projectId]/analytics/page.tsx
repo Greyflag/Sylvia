@@ -29,6 +29,8 @@ import {
   Target,
   ChevronLeft,
   ChevronRight,
+  Search,
+  Loader2,
 } from "lucide-react"
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -60,6 +62,9 @@ export default function AnalyticsPage() {
   const { currentProject } = useProject()
   const [openInsight, setOpenInsight] = useState<string | null>("satisfaction")
   const [selectedObjective, setSelectedObjective] = useState<string>("all")
+  const [showFakeAnalysis, setShowFakeAnalysis] = useState(false)
+  const [isAILoading, setIsAILoading] = useState(false)
+  const [aiLoadingStep, setAILoadingStep] = useState(0)
 
   // Get analytics data for this project
   const analytics = getProjectAnalytics(projectId)
@@ -304,6 +309,39 @@ export default function AnalyticsPage() {
       ? sylviaInsights
       : sylviaInsights.filter((insight) => insight.objectives.includes(selectedObjective))
 
+  // Handler for test AI analysis
+  const handleTestAIAnalysis = () => {
+    setIsAILoading(true)
+    setShowFakeAnalysis(false)
+    setAILoadingStep(0)
+    const steps = [
+      "Connecting to Sylvia AI...",
+      "Aggregating and normalizing survey data...",
+      "Detecting advanced patterns and correlations...",
+      "Performing sentiment and topic analysis...",
+      "Synthesizing actionable recommendations...",
+      "Finalizing your AI-powered analytics report..."
+    ]
+    let step = 0
+    const interval = setInterval(() => {
+      setAILoadingStep((prev) => {
+        if (prev < steps.length - 1) {
+          return prev + 1
+        }
+        return prev
+      })
+      step++
+      if (step >= steps.length) {
+        clearInterval(interval)
+      }
+    }, 1300)
+    setTimeout(() => {
+      setIsAILoading(false)
+      setShowFakeAnalysis(true)
+      setAILoadingStep(0)
+    }, 7800)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -319,6 +357,10 @@ export default function AnalyticsPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" className="border-sylvia-300 text-sylvia-700" onClick={handleTestAIAnalysis}>
+            <Brain className="mr-2 h-4 w-4 animate-pulse" />
+            Test AI Analysis
+          </Button>
           {!isCompleted && (
             <>
               <Button variant="outline">Save Draft</Button>
@@ -332,6 +374,64 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+
+      {/* AI Analysis Loading Animation */}
+      {isAILoading && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl p-10 flex flex-col items-center gap-8 min-w-[340px] max-w-[90vw] border-2 border-sylvia-200">
+            <div className="flex gap-6 text-sylvia-600 animate-pulse">
+              <Brain className="h-10 w-10 animate-spin" />
+              <BarChart3 className="h-10 w-10 animate-bounce" />
+              <Search className="h-10 w-10 animate-pulse" />
+              <Sparkles className="h-10 w-10 animate-spin-slow" />
+              <Loader2 className="h-10 w-10 animate-spin" />
+            </div>
+            <div className="text-xl font-semibold text-sylvia-700 text-center min-h-[48px]">
+              {[
+                "Connecting to Sylvia AI...",
+                "Aggregating and normalizing survey data...",
+                "Detecting advanced patterns and correlations...",
+                "Performing sentiment and topic analysis...",
+                "Synthesizing actionable recommendations...",
+                "Finalizing your AI-powered analytics report..."
+              ][aiLoadingStep]}
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="bg-sylvia-600 h-3 rounded-full transition-all duration-500" style={{ width: `${(aiLoadingStep + 1) * 16.66}%` }} />
+            </div>
+            <div className="text-xs text-gray-400 mt-2">Sylvia AI is analyzing your data and generating insights...</div>
+          </div>
+        </div>
+      )}
+
+      {/* Fake AI Analysis Card */}
+      {showFakeAnalysis && (
+        <Card className="border-2 border-sylvia-300 shadow-lg bg-gradient-to-br from-purple-50 to-sylvia-50 animate-fade-in">
+          <CardHeader className="flex flex-row items-center gap-4 pb-2">
+            <Brain className="h-7 w-7 text-sylvia-600 animate-pulse" />
+            <CardTitle className="text-2xl text-sylvia-900">Sylvia AI Deep Analysis</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-2">
+            <div className="text-lg font-semibold text-sylvia-700">Key Findings</div>
+            <ul className="list-disc pl-6 space-y-2 text-sylvia-800">
+              <li><b>Hidden Churn Risk:</b> Advanced pattern detection identified a 17% churn risk among mid-market customers, primarily driven by delayed feature adoption and low engagement in the first 60 days.</li>
+              <li><b>Sentiment Hotspots:</b> Sentiment analysis revealed that "support" and "integration" are the most polarizing topics, with 68% positive and 32% negative sentiment split. Negative comments cluster around onboarding complexity and response times.</li>
+              <li><b>Feature Impact:</b> Customers who used the new dashboard feature at least 3 times per week reported a 1.2-point higher satisfaction score and were 2.5x more likely to recommend the product.</li>
+              <li><b>Predictive NPS:</b> AI regression modeling predicts a 9-point NPS increase if documentation and onboarding are improved, with the largest impact among technical users.</li>
+              <li><b>Engagement Drop-off:</b> 24% of users show a sharp engagement drop after the first month, correlating with a lack of personalized follow-up and unclear value communication.</li>
+            </ul>
+            <div className="text-lg font-semibold text-sylvia-700 mt-6">AI Recommendations</div>
+            <ol className="list-decimal pl-6 space-y-2 text-sylvia-800">
+              <li>Launch a targeted onboarding campaign for new users, focusing on integration and support resources.</li>
+              <li>Develop a "quick wins" dashboard tour to drive early feature adoption and reduce first-month churn.</li>
+              <li>Expand documentation with technical deep-dives and real-world use cases, prioritizing feedback from detractors.</li>
+              <li>Implement proactive support check-ins for accounts with low engagement in the first 30 days.</li>
+              <li>Leverage promoters for testimonials and peer-led webinars to amplify positive sentiment and NPS.</li>
+            </ol>
+            <div className="text-xs text-gray-500 mt-4">This analysis is for demonstration purposes and does not affect your real analytics data.</div>
+          </CardContent>
+        </Card>
+      )}
 
       {!isCompleted ? (
         <Card className="bg-white/50 border">
