@@ -327,12 +327,6 @@ export default function ObjectivesPage() {
           {!isCompleted && (
             <>
               <Button variant="outline">Save Draft</Button>
-              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-                <Link href={`/projects/${projectId}/question-set`}>
-                  Continue
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </>
           )}
         </div>

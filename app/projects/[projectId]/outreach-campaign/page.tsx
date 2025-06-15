@@ -1,6 +1,5 @@
 "use client"
 
-import { ProgressTracker } from "@/components/progress-tracker"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -29,6 +28,7 @@ import { useParams } from "next/navigation"
 import { useProject } from "@/components/project-context"
 import { getProjectResponses } from "@/lib/data-service"
 import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 
 export default function OutreachCampaignPage() {
   const params = useParams()
@@ -61,6 +61,33 @@ export default function OutreachCampaignPage() {
   const openRate =
     responders.length > 0 ? Math.round(((completedResponses + inProgressResponses) / responders.length) * 100) : 0
 
+  const steps = [
+    {
+      name: "Define Objectives",
+      completed: true,
+    },
+    {
+      name: "Question Set",
+      completed: true,
+    },
+    {
+      name: "Contact List",
+      completed: true,
+    },
+    {
+      name: "Outreach Material",
+      completed: true,
+    },
+    {
+      name: "Outreach Campaign",
+      completed: true,
+    },
+    {
+      name: "Analytics & Reporting",
+      completed: false,
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -82,16 +109,33 @@ export default function OutreachCampaignPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline">Save Draft</Button>
-          <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-            <Link href={`/projects/${projectId}/analytics`}>
-              Continue
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
         </div>
       </div>
 
-      <ProgressTracker />
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[800px]">
+          <div className="flex items-center">
+            {steps.map((step, index) => (
+              <div key={step.name} className="flex items-center flex-1 relative">
+                <div
+                  className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium z-10",
+                    step.completed
+                      ? "bg-green-100 text-green-700 border border-green-200"
+                      : "bg-gray-100 text-gray-500 border border-gray-200",
+                  )}
+                >
+                  {index + 1}
+                </div>
+                <div className={cn("h-0.5 w-full", step.completed ? "bg-green-200" : "bg-gray-200")} />
+                <div className="absolute top-10 left-0 transform -translate-x-1/2 whitespace-nowrap text-xs font-medium">
+                  {step.name}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <Tabs defaultValue="campaign" className="space-y-4">
         <TabsList>

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getProjectContacts } from "@/lib/data-service"
+import { getProjectContacts, createContact, updateContact, deleteContact } from "@/lib/data-service"
 import { useProject } from "@/components/project-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
@@ -31,12 +31,28 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { CheckCircle, Download, MoreHorizontal, Plus, Upload, Zap, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ContactsPage() {
   const params = useParams()
   const projectId = params.projectId as string
   const { currentProject } = useProject()
   const [activeTab, setActiveTab] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedContact, setSelectedContact] = useState<any>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    role: "",
+    phone: "",
+    tags: ""
+  })
+  const { toast } = useToast()
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [viewContact, setViewContact] = useState<any>(null)
 
   // Get contacts for this project
   const contacts = getProjectContacts(projectId)
@@ -47,6 +63,108 @@ export default function ContactsPage() {
   // Get unique tags from contacts
   const allTags = contacts.flatMap((contact) => contact.tags)
   const uniqueTags = [...new Set(allTags)]
+
+  // Filter contacts based on search query
+  const filteredContacts = contacts.filter((contact) => {
+    const searchLower = searchQuery.toLowerCase()
+    return (
+      contact.name.toLowerCase().includes(searchLower) ||
+      contact.email.toLowerCase().includes(searchLower) ||
+      contact.company.toLowerCase().includes(searchLower) ||
+      contact.role.toLowerCase().includes(searchLower)
+    )
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddContact = () => {
+    try {
+      createContact(projectId, formData)
+      setIsAddDialogOpen(false)
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        role: "",
+        phone: "",
+        tags: ""
+      })
+      toast({
+        title: "Contact added",
+        description: "The contact has been added successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add contact. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleEditContact = () => {
+    if (!selectedContact) return
+    try {
+      updateContact(projectId, selectedContact.id, formData)
+      setIsEditDialogOpen(false)
+      setSelectedContact(null)
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        role: "",
+        phone: "",
+        tags: ""
+      })
+      toast({
+        title: "Contact updated",
+        description: "The contact has been updated successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update contact. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleDeleteContact = (contactId: string) => {
+    try {
+      deleteContact(projectId, contactId)
+      toast({
+        title: "Contact deleted",
+        description: "The contact has been deleted successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete contact. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const openEditDialog = (contact: any) => {
+    setSelectedContact(contact)
+    setFormData({
+      name: contact.name,
+      email: contact.email,
+      company: contact.company,
+      role: contact.role,
+      phone: contact.phone || "",
+      tags: contact.tags.join(", ")
+    })
+    setIsEditDialogOpen(true)
+  }
+
+  const openViewDialog = (contact: any) => {
+    setViewContact(contact)
+    setIsViewDialogOpen(true)
+  }
 
   return (
     <div className="space-y-6">
@@ -65,7 +183,7 @@ export default function ContactsPage() {
         <div className="flex gap-2">
           {!isCompleted && (
             <>
-              <Dialog>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-sylvia-600 hover:bg-sylvia-700">
                     <Plus className="mr-2 h-4 w-4" />
@@ -81,34 +199,34 @@ export default function ContactsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" placeholder="John Smith" />
+                        <Input id="name" name="name" value={formData.name} onChange={handleInputChange} placeholder="John Smith" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" placeholder="john@example.com" />
+                        <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="john@example.com" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="company">Company</Label>
-                        <Input id="company" placeholder="Acme Inc." />
+                        <Input id="company" name="company" value={formData.company} onChange={handleInputChange} placeholder="Acme Inc." />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="role">Role</Label>
-                        <Input id="role" placeholder="CTO" />
+                        <Input id="role" name="role" value={formData.role} onChange={handleInputChange} placeholder="CTO" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" placeholder="+1 (555) 123-4567" />
+                      <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+1 (555) 123-4567" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="tags">Tags (comma separated)</Label>
-                      <Input id="tags" placeholder="enterprise, tech, decision-maker" />
+                      <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} placeholder="enterprise, tech, decision-maker" />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700">
+                    <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700" onClick={handleAddContact}>
                       Add Contact
                     </Button>
                   </DialogFooter>
@@ -226,12 +344,6 @@ export default function ContactsPage() {
                 </DialogContent>
               </Dialog>
               <Button variant="outline">Save Draft</Button>
-              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-                <Link href={`/projects/${projectId}/outreach-material`}>
-                  Continue
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </>
           )}
           <Button variant="outline">
@@ -292,12 +404,16 @@ export default function ContactsPage() {
         <Tabs defaultValue="all" className="w-full max-w-md" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="all">All Contacts</TabsTrigger>
-            <TabsTrigger value="valid">Valid</TabsTrigger>
             <TabsTrigger value="invalid">Invalid</TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="relative w-full max-w-sm">
-          <Input placeholder="Search contacts..." className="pl-10" />
+          <Input 
+            placeholder="Search contacts..." 
+            className="pl-10" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
@@ -329,8 +445,8 @@ export default function ContactsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contacts.length > 0 ? (
-                contacts.map((contact) => (
+              {filteredContacts.length > 0 ? (
+                filteredContacts.map((contact) => (
                   <TableRow key={contact.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -372,10 +488,23 @@ export default function ContactsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          {!isCompleted && <DropdownMenuItem>Edit Contact</DropdownMenuItem>}
+                          <DropdownMenuItem onClick={() => openViewDialog(contact)}>
+                            View Details
+                          </DropdownMenuItem>
+                          {!isCompleted && (
+                            <DropdownMenuItem onClick={() => openEditDialog(contact)}>
+                              Edit Contact
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
-                          {!isCompleted && <DropdownMenuItem className="text-red-600">Remove</DropdownMenuItem>}
+                          {!isCompleted && (
+                            <DropdownMenuItem 
+                              className="text-red-600"
+                              onClick={() => handleDeleteContact(contact.id)}
+                            >
+                              Remove
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -384,7 +513,7 @@ export default function ContactsPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                    No contacts added yet. Click "Add Contact" or "Import CSV" to get started.
+                    No contacts found. {searchQuery ? "Try adjusting your search." : "Click 'Add Contact' or 'Import CSV' to get started."}
                   </TableCell>
                 </TableRow>
               )}
@@ -392,6 +521,133 @@ export default function ContactsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Contact</DialogTitle>
+            <DialogDescription>Update the contact's information.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">Full Name</Label>
+                <Input id="edit-name" name="name" value={formData.name} onChange={handleInputChange} placeholder="John Smith" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-email">Email Address</Label>
+                <Input id="edit-email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="john@example.com" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-company">Company</Label>
+                <Input id="edit-company" name="company" value={formData.company} onChange={handleInputChange} placeholder="Acme Inc." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-role">Role</Label>
+                <Input id="edit-role" name="role" value={formData.role} onChange={handleInputChange} placeholder="CTO" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-phone">Phone Number</Label>
+              <Input id="edit-phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+1 (555) 123-4567" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-tags">Tags (comma separated)</Label>
+              <Input id="edit-tags" name="tags" value={formData.tags} onChange={handleInputChange} placeholder="enterprise, tech, decision-maker" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" className="bg-sylvia-600 hover:bg-sylvia-700" onClick={handleEditContact}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Contact Details</DialogTitle>
+            <DialogDescription>View detailed information about the contact.</DialogDescription>
+          </DialogHeader>
+          {viewContact && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-sylvia-100 text-sylvia-700 text-xl">
+                    {viewContact.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-xl font-semibold">{viewContact.name}</h3>
+                  <p className="text-muted-foreground">{viewContact.role} at {viewContact.company}</p>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Email Address</Label>
+                  <div className="text-sm">{viewContact.email}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Phone Number</Label>
+                  <div className="text-sm">{viewContact.phone || "Not provided"}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Company</Label>
+                  <div className="text-sm">{viewContact.company}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Role</Label>
+                  <div className="text-sm">{viewContact.role}</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Tags</Label>
+                  <div className="flex flex-wrap gap-1">
+                    {viewContact.tags.map((tag: string, index: number) => (
+                      <Badge key={index} variant="outline" className="bg-white text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Status</Label>
+                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                    Valid
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            {!isCompleted && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsViewDialogOpen(false)
+                  openEditDialog(viewContact)
+                }}
+              >
+                Edit Contact
+              </Button>
+            )}
+            <Button onClick={() => setIsViewDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

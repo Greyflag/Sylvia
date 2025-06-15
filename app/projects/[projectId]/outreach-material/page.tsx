@@ -22,60 +22,142 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
+import { ProgressTracker } from "@/components/progress-tracker"
 
 export default function OutreachMaterialPage() {
   const params = useParams()
   const projectId = params.projectId as string
   const { currentProject } = useProject()
+  const [isCompleted, setIsCompleted] = useState(currentProject?.status === "completed")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [activeTab, setActiveTab] = useState("initial")
+  const [emailContent, setEmailContent] = useState({
+    initial: "",
+    reminder: "",
+    thankYou: "",
+  })
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
+  const loadingSteps = [
+    "Analyzing your requirements...",
+    "Researching best practices...",
+    "Crafting personalized content...",
+    "Optimizing for engagement...",
+    "Finalizing templates...",
+  ]
 
-  // Check if this is the completed project
-  const isCompleted = currentProject?.status === "completed"
+  const handleGenerate = async () => {
+    setIsDialogOpen(false)
+    setIsGenerating(true)
+    
+    // Simulate AI generation with steps
+    for (let i = 0; i < loadingSteps.length; i++) {
+      setLoadingStep(i)
+      await new Promise((resolve) => setTimeout(resolve, 1600)) // 8 seconds total (5 steps * 1.6 seconds)
+    }
 
-  const [emailSubject, setEmailSubject] = useState(
-    isCompleted
-      ? "Your feedback matters - Enterprise Customer Satisfaction Survey"
-      : "Help us improve - Product Feedback Survey",
-  )
-  const [emailBody, setEmailBody] = useState(
-    isCompleted
-      ? `Dear [Name],
+    // Generate content based on selected categories
+    const tone = (document.getElementById("tone") as HTMLSelectElement)?.value || "professional"
+    const audience = (document.getElementById("audience") as HTMLSelectElement)?.value || "enterprise"
+    const surveyLength = (document.getElementById("survey-length") as HTMLSelectElement)?.value || "medium"
+    const incentive = (document.getElementById("incentive") as HTMLSelectElement)?.value || "none"
 
-We value your partnership and would love to hear about your experience with our platform. Your feedback helps us continue to improve and better serve customers like you.
+    // Generate content for each email type
+    const initialContent = generateInitialEmail(tone, audience, surveyLength, incentive)
+    const reminderContent = generateReminderEmail(tone, audience, surveyLength, incentive)
+    const thankYouContent = generateThankYouEmail(tone, audience, incentive)
 
-This brief survey will take approximately 5-7 minutes to complete and covers:
-• Your overall satisfaction with our product
-• Features you find most valuable
-• Areas where we can improve
-• Your future needs and requirements
+    setEmailContent({
+      initial: initialContent,
+      reminder: reminderContent,
+      thankYou: thankYouContent,
+    })
 
-Your responses will be kept confidential and used solely to enhance our product and services.
+    setIsGenerating(false)
+    setLoadingStep(0)
+  }
+
+  const generateInitialEmail = (tone: string, audience: string, surveyLength: string, incentive: string) => {
+    const timeEstimate = surveyLength === "short" ? "2-3 minutes" : surveyLength === "medium" ? "5-7 minutes" : "10-15 minutes"
+    const incentiveText = incentive === "none" ? "" : `\n\nAs a token of our appreciation, we're offering ${getIncentiveText(incentive)}.`
+
+    return `Dear [Name],
+
+I hope this email finds you well. I'm reaching out because we value your feedback as a ${getAudienceText(audience)}.
+
+We're conducting a survey to better understand your experience with our product/service, and your insights would be incredibly valuable. The survey will take approximately ${timeEstimate} to complete.${incentiveText}
 
 [Survey Link]
 
-Thank you for your time and continued partnership.
+Your feedback will help us improve our offerings and better serve your needs. Thank you for your time and consideration.
 
 Best regards,
-The Customer Success Team`
-      : "",
-  )
+[Your Name]`
+  }
 
-  const [reminderSubject, setReminderSubject] = useState(isCompleted ? "Reminder: Share your feedback with us" : "")
-  const [reminderBody, setReminderBody] = useState(
-    isCompleted
-      ? `Hi [Name],
+  const generateReminderEmail = (tone: string, audience: string, surveyLength: string, incentive: string) => {
+    const incentiveText = incentive === "none" ? "" : `\n\nRemember, as a token of our appreciation, we're offering ${getIncentiveText(incentive)}.`
 
-We recently sent you a survey about your experience with our platform. If you haven't had a chance to complete it yet, we'd really appreciate your feedback.
+    return `Dear [Name],
 
-The survey takes just 5-7 minutes and your insights are invaluable in helping us improve.
+I wanted to follow up on our previous email regarding the survey. Your feedback is important to us, and we'd greatly appreciate your participation.${incentiveText}
 
 [Survey Link]
 
-Thank you!
+If you've already completed the survey, please disregard this email. Thank you for your time.
 
 Best regards,
-The Customer Success Team`
-      : "",
-  )
+[Your Name]`
+  }
+
+  const generateThankYouEmail = (tone: string, audience: string, incentive: string) => {
+    const incentiveText = incentive === "none" ? "" : `\n\nWe'll be in touch shortly with ${getIncentiveText(incentive)}.`
+
+    return `Dear [Name],
+
+Thank you for taking the time to complete our survey. Your feedback is invaluable and will help us improve our products and services.${incentiveText}
+
+If you have any additional thoughts or suggestions, please don't hesitate to reach out.
+
+Best regards,
+[Your Name]`
+  }
+
+  const getAudienceText = (audience: string) => {
+    switch (audience) {
+      case "enterprise":
+        return "valued enterprise customer"
+      case "smb":
+        return "valued small business customer"
+      case "technical":
+        return "technical user"
+      case "executives":
+        return "executive leader"
+      case "managers":
+        return "department manager"
+      case "end-users":
+        return "end user"
+      default:
+        return "valued customer"
+    }
+  }
+
+  const getIncentiveText = (incentive: string) => {
+    switch (incentive) {
+      case "report":
+        return "an executive summary report of the survey results"
+      case "gift-card":
+        return "a gift card as a token of appreciation"
+      case "donation":
+        return "to make a donation to a charity of your choice"
+      case "early-access":
+        return "early access to the survey results"
+      case "consultation":
+        return "a free consultation session"
+      default:
+        return ""
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -94,7 +176,7 @@ The Customer Success Team`
         <div className="flex gap-2">
           {!isCompleted && (
             <>
-              <Dialog>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
@@ -106,30 +188,12 @@ The Customer Success Team`
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-purple-600" />
-                      Sylvia AI Email Generation
-                    </DialogTitle>
+                    <DialogTitle>Generate Email Templates</DialogTitle>
                     <DialogDescription>
-                      Let Sylvia create personalized outreach emails based on your project context, target audience, and
-                      communication goals.
+                      Let Sylvia help you create professional email templates based on your preferences.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email-type">Email Type</Label>
-                      <Select defaultValue="invitation">
-                        <SelectTrigger id="email-type">
-                          <SelectValue placeholder="Select email type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="invitation">Initial Invitation</SelectItem>
-                          <SelectItem value="reminder">Reminder Email</SelectItem>
-                          <SelectItem value="thankyou">Thank You Message</SelectItem>
-                          <SelectItem value="all">All Templates</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="tone">Communication Tone</Label>
                       <Select defaultValue="professional">
@@ -190,21 +254,15 @@ The Customer Success Team`
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="additional-context">Additional Context (Optional)</Label>
-                      <Textarea
-                        id="additional-context"
-                        placeholder="Provide any specific messaging requirements, company culture notes, or relationship context..."
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
+                    <Button
+                      className="w-full bg-sylvia-600 hover:bg-sylvia-700"
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                    >
                       <Sparkles className="mr-2 h-4 w-4" />
                       Generate with Sylvia
                     </Button>
-                  </DialogFooter>
+                  </div>
                 </DialogContent>
               </Dialog>
               <Button className="bg-sylvia-600 hover:bg-sylvia-700">
@@ -221,12 +279,6 @@ The Customer Success Team`
             <>
               <div className="flex gap-2">
                 <Button variant="outline">Save Draft</Button>
-                <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-                  <Link href={`/projects/${projectId}/outreach-campaign`}>
-                    Continue
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
               </div>
             </>
           )}
@@ -281,56 +333,56 @@ The Customer Success Team`
         </Card>
       )}
 
-      <Tabs defaultValue="invitation" className="w-full">
-        <TabsList className="grid grid-cols-3 w-full max-w-md">
-          <TabsTrigger value="invitation">Initial Invitation</TabsTrigger>
-          <TabsTrigger value="reminder">Reminder</TabsTrigger>
-          <TabsTrigger value="thankyou">Thank You</TabsTrigger>
+      <Tabs defaultValue="initial" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="initial">Initial Invitation</TabsTrigger>
+          <TabsTrigger value="reminder">Reminder Email</TabsTrigger>
+          <TabsTrigger value="thank-you">Thank You Message</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="invitation" className="mt-6">
+        <TabsContent value="initial" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-sylvia-600" />
-                Initial Invitation Email
+                Initial Invitation
               </CardTitle>
-              <CardDescription>The first email sent to invite participants to your survey</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email-subject">Subject Line</Label>
-                <Input
-                  id="email-subject"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="Enter email subject"
-                  disabled={isCompleted}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email-body">Email Body</Label>
-                <Textarea
-                  id="email-body"
-                  value={emailBody}
-                  onChange={(e) => setEmailBody(e.target.value)}
-                  placeholder="Enter email content"
-                  rows={12}
-                  disabled={isCompleted}
-                />
-              </div>
-              {!isCompleted && (
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Sylvia Suggestions
-                  </Button>
-                  <Button variant="outline">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Use Template
-                  </Button>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="initial-subject">Email Subject</Label>
+                  <Input
+                    id="initial-subject"
+                    placeholder="Enter email subject"
+                    className="mt-1 bg-white/80"
+                    disabled={isCompleted}
+                  />
                 </div>
-              )}
+                <div>
+                  <Label htmlFor="initial-content">Email Content</Label>
+                  <Textarea
+                    id="initial-content"
+                    value={emailContent.initial}
+                    onChange={(e) => setEmailContent({ ...emailContent, initial: e.target.value })}
+                    placeholder="Enter email content"
+                    rows={12}
+                    disabled={isCompleted}
+                  />
+                </div>
+                {!isCompleted && (
+                  <div className="flex gap-2">
+                    <Button variant="outline">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Sylvia Suggestions
+                    </Button>
+                    <Button variant="outline">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Use Template
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -342,98 +394,89 @@ The Customer Success Team`
                 <Mail className="h-5 w-5 text-sylvia-600" />
                 Reminder Email
               </CardTitle>
-              <CardDescription>Follow-up email for participants who haven't responded yet</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reminder-subject">Subject Line</Label>
-                <Input
-                  id="reminder-subject"
-                  value={reminderSubject}
-                  onChange={(e) => setReminderSubject(e.target.value)}
-                  placeholder="Enter reminder subject"
-                  disabled={isCompleted}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reminder-body">Email Body</Label>
-                <Textarea
-                  id="reminder-body"
-                  value={reminderBody}
-                  onChange={(e) => setReminderBody(e.target.value)}
-                  placeholder="Enter reminder content"
-                  rows={10}
-                  disabled={isCompleted}
-                />
-              </div>
-              {!isCompleted && (
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Sylvia Suggestions
-                  </Button>
-                  <Button variant="outline">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Use Template
-                  </Button>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="reminder-subject">Email Subject</Label>
+                  <Input
+                    id="reminder-subject"
+                    placeholder="Enter email subject"
+                    className="mt-1 bg-white/80"
+                    disabled={isCompleted}
+                  />
                 </div>
-              )}
+                <div>
+                  <Label htmlFor="reminder-content">Email Content</Label>
+                  <Textarea
+                    id="reminder-content"
+                    value={emailContent.reminder}
+                    onChange={(e) => setEmailContent({ ...emailContent, reminder: e.target.value })}
+                    placeholder="Enter reminder email content"
+                    rows={12}
+                    disabled={isCompleted}
+                  />
+                </div>
+                {!isCompleted && (
+                  <div className="flex gap-2">
+                    <Button variant="outline">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Sylvia Suggestions
+                    </Button>
+                    <Button variant="outline">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Use Template
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="thankyou" className="mt-6">
+        <TabsContent value="thank-you" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-sylvia-600" />
+                <Mail className="h-5 w-5 text-sylvia-600" />
                 Thank You Message
               </CardTitle>
-              <CardDescription>Message shown after participants complete the survey</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="thankyou-title">Page Title</Label>
-                <Input
-                  id="thankyou-title"
-                  defaultValue={isCompleted ? "Thank you for your feedback!" : ""}
-                  placeholder="Enter thank you page title"
-                  disabled={isCompleted}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="thankyou-message">Thank You Message</Label>
-                <Textarea
-                  id="thankyou-message"
-                  defaultValue={
-                    isCompleted
-                      ? `Thank you for taking the time to complete our survey. Your feedback is invaluable in helping us improve our product and services.
-
-We'll review all responses carefully and use your insights to enhance your experience with our platform.
-
-If you have any additional questions or feedback, please don't hesitate to reach out to our team.
-
-Best regards,
-The Customer Success Team`
-                      : ""
-                  }
-                  placeholder="Enter thank you message"
-                  rows={8}
-                  disabled={isCompleted}
-                />
-              </div>
-              {!isCompleted && (
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Sylvia Suggestions
-                  </Button>
-                  <Button variant="outline">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Use Template
-                  </Button>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="thank-you-subject">Email Subject</Label>
+                  <Input
+                    id="thank-you-subject"
+                    placeholder="Enter email subject"
+                    className="mt-1 bg-white/80"
+                    disabled={isCompleted}
+                  />
                 </div>
-              )}
+                <div>
+                  <Label htmlFor="thank-you-content">Email Content</Label>
+                  <Textarea
+                    id="thank-you-content"
+                    value={emailContent.thankYou}
+                    onChange={(e) => setEmailContent({ ...emailContent, thankYou: e.target.value })}
+                    placeholder="Enter thank you message"
+                    rows={8}
+                    disabled={isCompleted}
+                  />
+                </div>
+                {!isCompleted && (
+                  <div className="flex gap-2">
+                    <Button variant="outline">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Sylvia Suggestions
+                    </Button>
+                    <Button variant="outline">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Use Template
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -468,6 +511,36 @@ The Customer Success Team`
           </div>
         </CardContent>
       </Card>
+
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div className="flex flex-col items-center space-y-6">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-sylvia-600 border-t-transparent rounded-full animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="h-8 w-8 text-sylvia-600" />
+                </div>
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold">Sylvia is working her magic</h3>
+                <p className="text-muted-foreground">{loadingSteps[loadingStep]}</p>
+              </div>
+              <div className="w-full space-y-2">
+                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-sylvia-600 transition-all duration-500"
+                    style={{ width: `${((loadingStep + 1) / loadingSteps.length) * 100}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  Step {loadingStep + 1} of {loadingSteps.length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
