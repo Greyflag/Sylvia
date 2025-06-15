@@ -32,7 +32,7 @@ import {
   Search,
   Loader2,
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Line,
@@ -65,9 +65,11 @@ export default function AnalyticsPage() {
   const [showFakeAnalysis, setShowFakeAnalysis] = useState(false)
   const [isAILoading, setIsAILoading] = useState(false)
   const [aiLoadingStep, setAILoadingStep] = useState(0)
+  const [fakeAnalytics, setFakeAnalytics] = useState<any | null>(null)
+  const analyticsRef = useRef<any>(null)
 
   // Get analytics data for this project
-  const analytics = getProjectAnalytics(projectId)
+  const analytics = fakeAnalytics || getProjectAnalytics(projectId)
   const responses = getProjectResponses(projectId)
 
   // Check if this is the completed project
@@ -75,19 +77,33 @@ export default function AnalyticsPage() {
 
   // Enhanced trend data
   const satisfactionTrendData = [
-    { month: "Jul", satisfaction: 3.8 },
-    { month: "Aug", satisfaction: 3.9 },
-    { month: "Sep", satisfaction: 4.0 },
-    { month: "Oct", satisfaction: 3.7 },
-    { month: "Nov", satisfaction: 4.2 },
+    { month: "Jan", satisfaction: 3.6 },
+    { month: "Feb", satisfaction: 3.7 },
+    { month: "Mar", satisfaction: 3.9 },
+    { month: "Apr", satisfaction: 4.1 },
+    { month: "May", satisfaction: 4.0 },
+    { month: "Jun", satisfaction: 3.8 },
+    { month: "Jul", satisfaction: 3.9 },
+    { month: "Aug", satisfaction: 4.2 },
+    { month: "Sep", satisfaction: 4.3 },
+    { month: "Oct", satisfaction: 4.1 },
+    { month: "Nov", satisfaction: 4.4 },
+    { month: "Dec", satisfaction: 4.3 },
   ]
 
   const npsTrendData = [
-    { month: "Jul", nps: 65 },
-    { month: "Aug", nps: 68 },
-    { month: "Sep", nps: 72 },
-    { month: "Oct", nps: 70 },
-    { month: "Nov", nps: 78 },
+    { month: "Jan", nps: 60 },
+    { month: "Feb", nps: 62 },
+    { month: "Mar", nps: 65 },
+    { month: "Apr", nps: 67 },
+    { month: "May", nps: 66 },
+    { month: "Jun", nps: 68 },
+    { month: "Jul", nps: 70 },
+    { month: "Aug", nps: 72 },
+    { month: "Sep", nps: 74 },
+    { month: "Oct", nps: 73 },
+    { month: "Nov", nps: 75 },
+    { month: "Dec", nps: 77 },
   ]
 
   const featureUsageData = [
@@ -314,6 +330,10 @@ export default function AnalyticsPage() {
     setIsAILoading(true)
     setShowFakeAnalysis(false)
     setAILoadingStep(0)
+    // Save original analytics for restoration
+    if (!analyticsRef.current) {
+      analyticsRef.current = getProjectAnalytics(projectId)
+    }
     const steps = [
       "Connecting to Sylvia AI...",
       "Aggregating and normalizing survey data...",
@@ -339,7 +359,30 @@ export default function AnalyticsPage() {
       setIsAILoading(false)
       setShowFakeAnalysis(true)
       setAILoadingStep(0)
+      // Set fake analytics data
+      setFakeAnalytics({
+        ...analyticsRef.current,
+        totalResponses: 12,
+        averageSatisfaction: 4.3,
+        npsScore: 67,
+        completionRate: 91,
+        responseRate: 80,
+      })
     }, 7800)
+  }
+
+  // Restore analytics on unmount or when fake analysis is dismissed
+  useEffect(() => {
+    return () => {
+      setFakeAnalytics(null)
+      analyticsRef.current = null
+    }
+  }, [])
+
+  // Optionally, add a button to dismiss fake analysis and restore original analytics
+  const handleDismissFakeAnalysis = () => {
+    setShowFakeAnalysis(false)
+    setFakeAnalytics(null)
   }
 
   return (
@@ -361,7 +404,12 @@ export default function AnalyticsPage() {
             <Brain className="mr-2 h-4 w-4 animate-pulse" />
             Test AI Analysis
           </Button>
-          {!isCompleted && (
+          {showFakeAnalysis && (
+            <Button variant="ghost" className="text-sylvia-600 underline" onClick={handleDismissFakeAnalysis}>
+              Dismiss Test Analysis
+            </Button>
+          )}
+          {!isCompleted && !showFakeAnalysis && (
             <>
               <Button variant="outline">Save Draft</Button>
               <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
@@ -433,7 +481,8 @@ export default function AnalyticsPage() {
         </Card>
       )}
 
-      {!isCompleted ? (
+      {/* Only show No Data Available if not completed and not showing fake analysis */}
+      {!isCompleted && !showFakeAnalysis ? (
         <Card className="bg-white/50 border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-amber-600 mb-2">
@@ -648,7 +697,7 @@ export default function AnalyticsPage() {
                     <CardTitle>Satisfaction Trend</CardTitle>
                     <CardDescription>Average satisfaction score over time</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="h-[340px] overflow-x-auto">
                     <ChartContainer
                       config={{
                         satisfaction: {
@@ -656,22 +705,22 @@ export default function AnalyticsPage() {
                           color: "hsl(var(--chart-1))",
                         },
                       }}
-                      className="h-[250px]"
+                      className="h-full min-w-[340px]"
                     >
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="99%" height="100%">
                         <LineChart data={satisfactionTrendData}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="month" />
-                          <YAxis domain={[0, 5]} />
+                          <YAxis domain={[3.5, 4.5]} />
                           <ChartTooltip content={<ChartTooltipContent />} />
                           <Legend />
                           <Line
                             type="monotone"
                             dataKey="satisfaction"
-                            stroke="var(--color-satisfaction)"
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
+                            stroke="#7c3aed"
+                            strokeWidth={3}
+                            dot={{ r: 3 }}
+                            activeDot={{ r: 5 }}
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -684,7 +733,7 @@ export default function AnalyticsPage() {
                     <CardTitle>NPS Trend</CardTitle>
                     <CardDescription>Net Promoter Score over time</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="h-[340px] overflow-x-auto">
                     <ChartContainer
                       config={{
                         nps: {
@@ -692,22 +741,22 @@ export default function AnalyticsPage() {
                           color: "hsl(var(--chart-2))",
                         },
                       }}
-                      className="h-[250px]"
+                      className="h-full min-w-[340px]"
                     >
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="99%" height="100%">
                         <LineChart data={npsTrendData}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="month" />
-                          <YAxis domain={[0, 100]} />
+                          <YAxis domain={[55, 80]} />
                           <ChartTooltip content={<ChartTooltipContent />} />
                           <Legend />
                           <Line
                             type="monotone"
                             dataKey="nps"
-                            stroke="var(--color-nps)"
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
+                            stroke="#06b6d4"
+                            strokeWidth={3}
+                            dot={{ r: 3 }}
+                            activeDot={{ r: 5 }}
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -716,34 +765,30 @@ export default function AnalyticsPage() {
                 </Card>
               </div>
 
-              <Card>
+              <Card className="h-full min-h-[340px]">
                 <CardHeader>
                   <CardTitle>NPS Breakdown</CardTitle>
                   <CardDescription>Distribution of promoters, passives, and detractors</CardDescription>
                 </CardHeader>
-                <CardContent className="flex justify-center">
-                  <div className="w-full max-w-md h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={npsBreakdownData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {npsBreakdownData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => `${value}%`} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
+                <CardContent className="h-[340px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={npsBreakdownData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={110}
+                        label
+                      >
+                        {npsBreakdownData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -756,27 +801,25 @@ export default function AnalyticsPage() {
                     <CardTitle>Satisfaction by Role</CardTitle>
                     <CardDescription>How different roles rate their satisfaction</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ChartContainer
-                      config={{
-                        satisfaction: {
-                          label: "Satisfaction",
-                          color: "hsl(var(--chart-1))",
-                        },
-                      }}
-                      className="h-[250px]"
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={satisfactionByRoleData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis domain={[0, 5]} />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                          <Legend />
-                          <Bar dataKey="satisfaction" fill="var(--color-satisfaction)" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
+                  <CardContent className="h-[340px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={satisfactionByRoleData}
+                          dataKey="satisfaction"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={110}
+                          label
+                        >
+                          {satisfactionByRoleData.map((entry, index) => (
+                            <Cell key={`cell-role-${index}`} fill={["#7c3aed", "#06b6d4", "#f59e42", "#a3e635"][index % 4]} />
+                          ))}
+                        </Pie>
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
@@ -1041,90 +1084,53 @@ export default function AnalyticsPage() {
             {/* Churn Analysis Tab */}
             <TabsContent value="churn" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="h-full min-h-[340px]">
                   <CardHeader>
-                    <CardTitle>Churn Rate Trend</CardTitle>
-                    <CardDescription>Churn rate over time</CardDescription>
+                    <CardTitle>Churn Reasons</CardTitle>
+                    <CardDescription>Top reasons for customer churn</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ChartContainer
-                      config={{
-                        churnRate: {
-                          label: "Churn Rate",
-                          color: "hsl(var(--chart-4))",
-                        },
-                      }}
-                      className="h-[250px]"
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={churnData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
-                          <YAxis domain={[0, 15]} />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                          <Legend />
-                          <Line
-                            type="monotone"
-                            dataKey="churnRate"
-                            stroke="var(--color-churnRate)"
-                            strokeWidth={2}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
+                  <CardContent className="h-[340px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={churnReasonData}
+                          dataKey="percentage"
+                          nameKey="reason"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={110}
+                          label
+                        >
+                          {churnReasonData.map((entry, index) => (
+                            <Cell key={`cell-churn-${index}`} fill={["#f59e42", "#ef4444", "#06b6d4", "#7c3aed", "#a3e635", "#fbbf24"][index % 6]} />
+                          ))}
+                        </Pie>
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Churn Reasons</CardTitle>
-                    <CardDescription>Primary reasons for customer churn</CardDescription>
+                    <CardTitle>Churn by Segment</CardTitle>
+                    <CardDescription>Churn rate and average tenure by segment</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex justify-center">
-                    <div className="w-full max-w-md h-[250px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={churnReasonData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={100}
-                            fill="#8884d8"
-                            dataKey="percentage"
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                          >
-                            {churnReasonData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value) => `${value}%`} />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={churnBySegmentData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="segment" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="churnRate" fill="#ef4444" name="Churn Rate (%)" />
+                        <Bar dataKey="avgTenure" fill="#06b6d4" name="Avg Tenure (months)" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Churn by Segment</CardTitle>
-                  <CardDescription>Churn rate by customer segment</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {churnBySegmentData.map((segment) => (
-                      <div key={segment.segment} className="flex items-center justify-between">
-                        <span className="text-sm">{segment.segment}</span>
-                        <Badge variant="outline">{segment.churnRate}% churn rate</Badge>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
 
               <Card>
                 <CardHeader>
