@@ -352,36 +352,36 @@ Best regards,
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="initial-subject">Email Subject</Label>
-                  <Input
+                <Input
                     id="initial-subject"
-                    placeholder="Enter email subject"
+                  placeholder="Enter email subject"
                     className="mt-1 bg-white/80"
-                    disabled={isCompleted}
-                  />
-                </div>
+                  disabled={isCompleted}
+                />
+              </div>
                 <div>
                   <Label htmlFor="initial-content">Email Content</Label>
-                  <Textarea
+                <Textarea
                     id="initial-content"
                     value={emailContent.initial}
                     onChange={(e) => setEmailContent({ ...emailContent, initial: e.target.value })}
-                    placeholder="Enter email content"
-                    rows={12}
-                    disabled={isCompleted}
-                  />
+                  placeholder="Enter email content"
+                  rows={12}
+                  disabled={isCompleted}
+                />
+              </div>
+              {!isCompleted && (
+                <div className="flex gap-2">
+                  <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Sylvia Suggestions
+                  </Button>
+                  <Button variant="outline">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Use Template
+                  </Button>
                 </div>
-                {!isCompleted && (
-                  <div className="flex gap-2">
-                    <Button variant="outline">
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Sylvia Suggestions
-                    </Button>
-                    <Button variant="outline">
-                      <Edit className="mr-2 h-4 w-4" />
-                      Use Template
-                    </Button>
-                  </div>
-                )}
+              )}
               </div>
             </CardContent>
           </Card>
@@ -399,36 +399,36 @@ Best regards,
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="reminder-subject">Email Subject</Label>
-                  <Input
-                    id="reminder-subject"
+                <Input
+                  id="reminder-subject"
                     placeholder="Enter email subject"
                     className="mt-1 bg-white/80"
-                    disabled={isCompleted}
-                  />
-                </div>
+                  disabled={isCompleted}
+                />
+              </div>
                 <div>
                   <Label htmlFor="reminder-content">Email Content</Label>
-                  <Textarea
+                <Textarea
                     id="reminder-content"
                     value={emailContent.reminder}
                     onChange={(e) => setEmailContent({ ...emailContent, reminder: e.target.value })}
                     placeholder="Enter reminder email content"
                     rows={12}
-                    disabled={isCompleted}
-                  />
+                  disabled={isCompleted}
+                />
+              </div>
+              {!isCompleted && (
+                <div className="flex gap-2">
+                  <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Sylvia Suggestions
+                  </Button>
+                  <Button variant="outline">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Use Template
+                  </Button>
                 </div>
-                {!isCompleted && (
-                  <div className="flex gap-2">
-                    <Button variant="outline">
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Sylvia Suggestions
-                    </Button>
-                    <Button variant="outline">
-                      <Edit className="mr-2 h-4 w-4" />
-                      Use Template
-                    </Button>
-                  </div>
-                )}
+              )}
               </div>
             </CardContent>
           </Card>
@@ -446,36 +446,36 @@ Best regards,
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="thank-you-subject">Email Subject</Label>
-                  <Input
+                <Input
                     id="thank-you-subject"
                     placeholder="Enter email subject"
                     className="mt-1 bg-white/80"
-                    disabled={isCompleted}
-                  />
-                </div>
+                  disabled={isCompleted}
+                />
+              </div>
                 <div>
                   <Label htmlFor="thank-you-content">Email Content</Label>
-                  <Textarea
+                <Textarea
                     id="thank-you-content"
                     value={emailContent.thankYou}
                     onChange={(e) => setEmailContent({ ...emailContent, thankYou: e.target.value })}
-                    placeholder="Enter thank you message"
-                    rows={8}
-                    disabled={isCompleted}
-                  />
+                  placeholder="Enter thank you message"
+                  rows={8}
+                  disabled={isCompleted}
+                />
+              </div>
+              {!isCompleted && (
+                <div className="flex gap-2">
+                  <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Sylvia Suggestions
+                  </Button>
+                  <Button variant="outline">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Use Template
+                  </Button>
                 </div>
-                {!isCompleted && (
-                  <div className="flex gap-2">
-                    <Button variant="outline">
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Sylvia Suggestions
-                    </Button>
-                    <Button variant="outline">
-                      <Edit className="mr-2 h-4 w-4" />
-                      Use Template
-                    </Button>
-                  </div>
-                )}
+              )}
               </div>
             </CardContent>
           </Card>

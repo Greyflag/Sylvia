@@ -202,6 +202,10 @@ export default function QuestionSetPage() {
   const [autoGenerateInput, setAutoGenerateInput] = useState("");
   const [isAILoading, setIsAILoading] = useState(false);
   const [aiLoadingStep, setAILoadingStep] = useState(0);
+  // New state for dropdowns
+  const [focusArea, setFocusArea] = useState("Customer Satisfaction");
+  const [industryContext, setIndustryContext] = useState("Technology");
+  const [numQuestions, setNumQuestions] = useState("10 questions");
 
   // On mount, initialize questions from data-service
   useEffect(() => {
@@ -374,9 +378,50 @@ export default function QuestionSetPage() {
     setTimeout(() => {
       setIsAILoading(false);
       setAILoadingStep(0);
-      // Add the provided question objects
-      setQuestions(prev => ([
-        // --- BEGIN provided question objects ---
+      // Hardcoded question sets for 5, 10, 15
+      const questions5 = [
+        {
+          id: "q1",
+          text: "How satisfied are you with our product overall?",
+          type: "multiple-choice",
+          section: "General",
+          required: true,
+          options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"],
+        },
+        {
+          id: "q2",
+          text: "What is the primary reason for your satisfaction or dissatisfaction?",
+          type: "open-ended",
+          section: "General",
+          required: false,
+          options: [],
+        },
+        {
+          id: "q3",
+          text: "How likely are you to recommend our product to others?",
+          type: "multiple-choice",
+          section: "General",
+          required: true,
+          options: ["Very likely", "Likely", "Neutral", "Unlikely", "Very unlikely"],
+        },
+        {
+          id: "q4",
+          text: "Which feature do you use the most?",
+          type: "multiple-choice",
+          section: "Usage",
+          required: false,
+          options: ["Feature A", "Feature B", "Feature C", "Feature D"],
+        },
+        {
+          id: "q5",
+          text: "What is one thing we could improve?",
+          type: "open-ended",
+          section: "Improvement",
+          required: false,
+          options: [],
+        },
+      ];
+      const questions10 = [
         {
           id: "intro-1",
           text: "Thank you for taking our survey! We are always looking to improve our customer experience in an effort to better support organizations like yours. To that end, we are hoping to collect feedback from former customers like you to help inform our approach. We expect this survey will take 10-15 minutes to complete. Please answer as candidly and transparently as possible—we want to hear the 'hard truth' so we can improve! (Incentive information will be provided at the end of the survey.) To begin, please enter the email address this survey invitation was sent to—this will help ensure you don't receive repeat requests to participate.",
@@ -501,30 +546,98 @@ export default function QuestionSetPage() {
             "Our organization stopped fundraising operations altogether"
           ],
         },
+      ];
+      const questions15 = [
+        ...questions10,
         {
-          id: "winback-1",
-          text: "What (if anything) could [ClientCompany] do to win back your business?",
+          id: "extra-1",
+          text: "How frequently do you use our product or service?",
+          type: "multiple-choice",
+          section: "Usage",
+          required: false,
+          options: ["Daily", "Weekly", "Monthly", "Rarely", "Never"],
+        },
+        {
+          id: "extra-2",
+          text: "What is your favorite feature and why?",
           type: "open-ended",
-          section: "Win-back potential",
+          section: "Features",
           required: false,
           options: [],
         },
         {
-          id: "winback-2",
-          text: "How likely is your organization to subscribe to [ClientCompany] again in the future?",
-          type: "multiple-choice",
-          section: "Win-back potential",
+          id: "extra-3",
+          text: "Have you experienced any issues or bugs? If so, please describe.",
+          type: "open-ended",
+          section: "Support",
           required: false,
-          options: [
-            "Very likely",
-            "More likely than not",
-            "50/50",
-            "Unlikely",
-            "Very unlikely",
-            "Uncertain"
-          ],
+          options: [],
         },
-      ]));
+        {
+          id: "extra-4",
+          text: "How would you rate our customer support?",
+          type: "multiple-choice",
+          section: "Support",
+          required: false,
+          options: ["Excellent", "Good", "Average", "Poor", "Very poor"],
+        },
+        {
+          id: "extra-5",
+          text: "What additional features would you like to see in the future?",
+          type: "open-ended",
+          section: "Improvement",
+          required: false,
+          options: [],
+        },
+      ];
+      const questions20 = [
+        ...questions15,
+        {
+          id: "extra-6",
+          text: "How easy is it to navigate our product interface?",
+          type: "multiple-choice",
+          section: "Usability",
+          required: false,
+          options: ["Very easy", "Easy", "Neutral", "Difficult", "Very difficult"],
+        },
+        {
+          id: "extra-7",
+          text: "Have you contacted customer support in the last 6 months?",
+          type: "multiple-choice",
+          section: "Support",
+          required: false,
+          options: ["Yes", "No"],
+        },
+        {
+          id: "extra-8",
+          text: "If yes, how satisfied were you with the support received?",
+          type: "multiple-choice",
+          section: "Support",
+          required: false,
+          options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"],
+        },
+        {
+          id: "extra-9",
+          text: "What is your preferred method of communication with us?",
+          type: "multiple-choice",
+          section: "Communication",
+          required: false,
+          options: ["Email", "Phone", "Live Chat", "In-app Messaging", "Other"],
+        },
+        {
+          id: "extra-10",
+          text: "Do you have any other comments or suggestions for us?",
+          type: "open-ended",
+          section: "General Feedback",
+          required: false,
+          options: [],
+        },
+      ];
+      let selectedQuestions = questions10;
+      if (numQuestions === "5 questions") selectedQuestions = questions5;
+      if (numQuestions === "15 questions") selectedQuestions = questions15;
+      if (numQuestions === "20 questions") selectedQuestions = questions20;
+      setQuestions(selectedQuestions);
       setAutoGenerateInput("");
     }, 10000);
   };
@@ -629,13 +742,13 @@ export default function QuestionSetPage() {
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-12">
                         <span className="block text-4xl text-gray-300 mb-2">?</span>
-                        <div className="font-medium text-gray-500">No questions added yet</div>
-                        <div className="text-sm text-gray-400 mb-2">Get started by adding questions manually or using AI generation</div>
-                        <div className="flex gap-2 justify-center">
+                        <span className="font-medium text-gray-500">No questions added yet</span><br/>
+                        <span className="text-sm text-gray-400 mb-2">Get started by adding questions manually or using AI generation</span><br/>
+                        <span>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-gray-300 text-gray-700"
+                            className="border-gray-300 text-gray-700 mr-2"
                             onClick={() => setIsAutoGenerateOpen(true)}
                           >
                             <Sparkles className="mr-2 h-4 w-4" />
@@ -648,7 +761,7 @@ export default function QuestionSetPage() {
                           >
                             + Add Manually
                           </Button>
-                        </div>
+                        </span>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -1056,25 +1169,75 @@ export default function QuestionSetPage() {
       <Dialog open={isAutoGenerateOpen} onOpenChange={setIsAutoGenerateOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Auto-Generate Questions</DialogTitle>
+            <DialogTitle>AI Question Generation</DialogTitle>
             <DialogDescription>
-              Enter keywords, ideas, or goals for the questions you want to generate. (e.g. onboarding, product feedback, customer satisfaction)
+              Let our AI generate survey questions based on your project objectives and industry best practices.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div>
+              <Label htmlFor="focus-area">Focus Area</Label>
+              <Select value={focusArea} onValueChange={setFocusArea}>
+                <SelectTrigger id="focus-area">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Customer Satisfaction">Customer Satisfaction</SelectItem>
+                  <SelectItem value="Employee Engagement">Employee Engagement</SelectItem>
+                  <SelectItem value="Product Feedback">Product Feedback</SelectItem>
+                  <SelectItem value="Market Research">Market Research</SelectItem>
+                  <SelectItem value="Brand Awareness">Brand Awareness</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="industry-context">Industry Context</Label>
+              <Select value={industryContext} onValueChange={setIndustryContext}>
+                <SelectTrigger id="industry-context">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Technology">Technology</SelectItem>
+                  <SelectItem value="Healthcare">Healthcare</SelectItem>
+                  <SelectItem value="Finance">Finance</SelectItem>
+                  <SelectItem value="Education">Education</SelectItem>
+                  <SelectItem value="Retail">Retail</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="num-questions">Number of Questions</Label>
+              <Select value={numQuestions} onValueChange={setNumQuestions}>
+                <SelectTrigger id="num-questions">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5 questions">5 questions</SelectItem>
+                  <SelectItem value="10 questions">10 questions</SelectItem>
+                  <SelectItem value="15 questions">15 questions</SelectItem>
+                  <SelectItem value="20 questions">20 questions</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="auto-context">Additional Context (Optional)</Label>
             <Textarea
+                id="auto-context"
               value={autoGenerateInput}
               onChange={e => setAutoGenerateInput(e.target.value)}
-              placeholder="Type your keywords, ideas, or goals here..."
+                placeholder="Provide any specific requirements or context for question generation..."
               rows={4}
             />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAutoGenerateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAIGenerate}>
-              Generate
+            <Button className="bg-sylvia-600 hover:bg-sylvia-700" onClick={handleAIGenerate}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate Questions
             </Button>
           </DialogFooter>
         </DialogContent>

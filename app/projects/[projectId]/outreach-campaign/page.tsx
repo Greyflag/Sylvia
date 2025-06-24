@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Progress } from "@/components/ui/progress"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import { useProject } from "@/components/project-context"
 import { getProjectResponses } from "@/lib/data-service"
 import { useState, useEffect } from "react"
@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils"
 
 export default function OutreachCampaignPage() {
   const params = useParams()
+  const pathname = usePathname()
   const projectId = params.projectId as string
   const { currentProject } = useProject()
   const [responders, setResponders] = useState<any[]>([])
@@ -64,26 +65,32 @@ export default function OutreachCampaignPage() {
   const steps = [
     {
       name: "Define Objectives",
+      path: `/projects/${projectId}/objectives`,
       completed: true,
     },
     {
       name: "Question Set",
+      path: `/projects/${projectId}/question-set`,
       completed: true,
     },
     {
       name: "Contact List",
+      path: `/projects/${projectId}/contacts`,
       completed: true,
     },
     {
       name: "Outreach Material",
+      path: `/projects/${projectId}/outreach-material`,
       completed: true,
     },
     {
       name: "Outreach Campaign",
-      completed: true,
+      path: `/projects/${projectId}/outreach-campaign`,
+      completed: pathname.startsWith(`/projects/${projectId}/outreach-campaign`),
     },
     {
       name: "Analytics & Reporting",
+      path: `/projects/${projectId}/analytics`,
       completed: false,
     },
   ]
@@ -112,28 +119,32 @@ export default function OutreachCampaignPage() {
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <div className="min-w-[800px]">
-          <div className="flex items-center">
-            {steps.map((step, index) => (
-              <div key={step.name} className="flex items-center flex-1 relative">
-                <div
-                  className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium z-10",
-                    step.completed
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-gray-100 text-gray-500 border border-gray-200",
-                  )}
-                >
-                  {index + 1}
-                </div>
-                <div className={cn("h-0.5 w-full", step.completed ? "bg-green-200" : "bg-gray-200")} />
-                <div className="absolute top-10 left-0 transform -translate-x-1/2 whitespace-nowrap text-xs font-medium">
-                  {step.name}
-                </div>
+      {/* Progress Bar - now full width, always visible, with vertical space */}
+      <div className="w-full py-8">
+        <div className="flex items-center justify-between gap-0">
+          {steps.map((step, index) => (
+            <div key={step.name} className="flex-1 flex flex-col items-center relative">
+              <div
+                className={cn(
+                  "flex items-center justify-center w-10 h-10 rounded-full text-base font-bold z-10 mb-2",
+                  step.completed
+                    ? "bg-green-100 text-green-700 border border-green-200"
+                    : "bg-gray-100 text-gray-500 border border-gray-200",
+                )}
+              >
+                {index + 1}
               </div>
-            ))}
-          </div>
+              {/* Connector line except for last step */}
+              {index < steps.length - 1 && (
+                <div className="absolute top-5 left-1/2 w-full h-0.5 z-0" style={{ right: '-50%', left: '50%' }}>
+                  <div className={cn("h-0.5", step.completed ? "bg-green-200" : "bg-gray-200")} style={{ width: '100%' }} />
+                </div>
+              )}
+              <div className="mt-2 text-xs font-medium text-center whitespace-nowrap" style={{ minWidth: 90 }}>
+                {step.name}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -358,14 +369,11 @@ export default function OutreachCampaignPage() {
             </CardHeader>
             <CardContent>
               {isCampaignLaunched ? (
-                // Existing respondents table code
-                <div className="rounded-md border overflow-hidden bg-white/80">
+                <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Respondent</TableHead>
-                        <TableHead>Company</TableHead>
-                        <TableHead>Role</TableHead>
+                        <TableHead>Contact</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Progress</TableHead>
                         <TableHead>Completed</TableHead>
@@ -373,80 +381,99 @@ export default function OutreachCampaignPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {responders.map((responder) => (
-                        <TableRow key={responder.id} className="hover:bg-sylvia-50/50">
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Avatar>
-                                <AvatarFallback className="bg-sylvia-100 text-sylvia-700">
-                                  {responder.avatar}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="font-medium">{responder.name}</div>
-                                <div className="text-xs text-muted-foreground">{responder.email}</div>
-                              </div>
+                      {responders.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6}>
+                            <div className="text-center py-8">
+                              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">Campaign Not Launched</h3>
+                              <p className="text-gray-500 mb-4">
+                                Launch your campaign to start tracking respondent progress and responses.
+                              </p>
+                              <Button className="bg-sylvia-600 hover:bg-sylvia-700">
+                                <Zap className="mr-2 h-4 w-4" />
+                                Launch Campaign
+                              </Button>
                             </div>
-                          </TableCell>
-                          <TableCell>{responder.company}</TableCell>
-                          <TableCell>{responder.role}</TableCell>
-                          <TableCell>
-                            <Badge
-                              className={
-                                responder.status === "completed"
-                                  ? "bg-green-100 text-green-700 border-green-200"
-                                  : responder.status === "in-progress"
-                                    ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                    : "bg-gray-100 text-gray-700 border-gray-200"
-                              }
-                            >
-                              {responder.status === "completed"
-                                ? "Completed"
-                                : responder.status === "in-progress"
-                                  ? "In Progress"
-                                  : "Sent"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Progress
-                                value={responder.progress}
-                                className="h-2 w-24"
-                                indicatorClassName={
-                                  responder.status === "completed"
-                                    ? "bg-green-500"
-                                    : responder.status === "in-progress"
-                                      ? "bg-yellow-500"
-                                      : "bg-gray-300"
-                                }
-                              />
-                              <span className="text-xs">{responder.progress}%</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {responder.completedAt
-                              ? new Date(responder.completedAt).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              : "—"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-sylvia-600 hover:text-sylvia-700 hover:bg-sylvia-50"
-                              asChild
-                            >
-                              <Link href={`/projects/${projectId}/outreach-campaign/${responder.id}`}>
-                                View Details
-                              </Link>
-                            </Button>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        responders.map((responder) => (
+                          <TableRow key={responder.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-3">
+                                <Avatar>
+                                  <AvatarFallback>
+                                    {responder.name
+                                      .split(" ")
+                                      .map((n: string) => n[0])
+                                      .join("")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <div className="font-medium">{responder.name}</div>
+                                  <div className="text-sm text-muted-foreground">{responder.email}</div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                className={
+                                  responder.status === "completed"
+                                    ? "bg-green-100 text-green-700 border-green-200"
+                                    : responder.status === "in-progress"
+                                      ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                      : "bg-gray-100 text-gray-700 border-gray-200"
+                                }
+                              >
+                                {responder.status === "completed"
+                                  ? "Completed"
+                                  : responder.status === "in-progress"
+                                    ? "In Progress"
+                                    : "Not Started"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Progress
+                                  value={responder.progress}
+                                  className="h-2 w-24"
+                                  indicatorClassName={
+                                    responder.status === "completed"
+                                      ? "bg-green-500"
+                                      : responder.status === "in-progress"
+                                        ? "bg-yellow-500"
+                                        : "bg-gray-300"
+                                  }
+                                />
+                                <span className="text-xs">{responder.progress}%</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {responder.completedAt
+                                ? new Date(responder.completedAt).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
+                                : "—"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-sylvia-600 hover:text-sylvia-700 hover:bg-sylvia-50"
+                                asChild
+                              >
+                                <Link href={`/projects/${projectId}/outreach-campaign/${responder.id}`}>
+                                  View Details
+                                </Link>
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -576,21 +603,6 @@ export default function OutreachCampaignPage() {
           )}
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-between">
-        <Button variant="outline" asChild>
-          <Link href={`/projects/${projectId}/outreach-material`}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Back to Outreach Material
-          </Link>
-        </Button>
-        <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-          <Link href={`/projects/${projectId}/analytics`}>
-            Continue to Analytics
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   )
 }
