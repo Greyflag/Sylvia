@@ -195,11 +195,14 @@ const emptyResponses: any[] = []
 // Store for draft project questions
 let draftQuestions: any[] = []
 
+// Store for draft project contacts
+let draftContacts: any[] = []
+
 export function getProjectContacts(projectId: string) {
   if (projectId === "enterprise-satisfaction") {
     return enterpriseContacts
   }
-  return emptyContacts
+  return draftContacts
 }
 
 export function getProjectQuestionSet(projectId: string) {
@@ -291,4 +294,47 @@ export function updateProject(projectId: string, project: any) {
   }
   // In a real app, this would update the project in the database
   return project
+}
+
+export function createContact(projectId: string, contact: any) {
+  if (projectId === "enterprise-satisfaction") {
+    return // Don't modify the completed project
+  }
+  const newContact = {
+    ...contact,
+    id: `contact-${Date.now()}`,
+    status: "valid",
+    tags: contact.tags ? contact.tags.split(",").map((tag: string) => tag.trim()) : []
+  }
+  draftContacts.push(newContact)
+  return newContact
+}
+
+export function updateContact(projectId: string, contactId: string, updates: any) {
+  if (projectId === "enterprise-satisfaction") {
+    return // Don't modify the completed project
+  }
+  const index = draftContacts.findIndex(contact => contact.id === contactId)
+  if (index !== -1) {
+    const updatedContact = {
+      ...draftContacts[index],
+      ...updates,
+      tags: updates.tags ? updates.tags.split(",").map((tag: string) => tag.trim()) : draftContacts[index].tags
+    }
+    draftContacts[index] = updatedContact
+    return updatedContact
+  }
+  return null
+}
+
+export function deleteContact(projectId: string, contactId: string) {
+  if (projectId === "enterprise-satisfaction") {
+    return // Don't modify the completed project
+  }
+  const index = draftContacts.findIndex(contact => contact.id === contactId)
+  if (index !== -1) {
+    draftContacts.splice(index, 1)
+    return true
+  }
+  return false
 }
