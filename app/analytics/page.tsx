@@ -1,4 +1,3 @@
-import { ProgressTracker } from "@/components/progress-tracker"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -25,8 +24,6 @@ export default function AnalyticsPage() {
           <Button>Share Results</Button>
         </div>
       </div>
-
-      <ProgressTracker />
 
       <Alert variant="warning">
         <AlertCircle className="h-4 w-4" />

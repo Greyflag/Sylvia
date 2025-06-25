@@ -1,4 +1,4 @@
-import { ProgressTracker } from "@/components/progress-tracker"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -29,7 +29,6 @@ export default function ObjectivesPage() {
         </div>
       </div>
 
-      <ProgressTracker />
 
       <Tabs defaultValue="objectives" className="space-y-4">
         <TabsList>

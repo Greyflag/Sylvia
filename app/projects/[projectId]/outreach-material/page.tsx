@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { ProgressTracker } from "@/components/progress-tracker"
 
 export default function OutreachMaterialPage() {
   const params = useParams()

@@ -1,4 +1,4 @@
-import { ProgressTracker } from "@/components/progress-tracker"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -30,7 +30,6 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      <ProgressTracker />
 
       <Card className="glass-card">
         <CardHeader>
