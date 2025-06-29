@@ -656,18 +656,20 @@ export default function QuestionSetPage() {
             <p className="text-muted-foreground mt-1">Design and manage your survey questions</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            className="bg-gradient-to-r from-[#f5eafe] to-[#e0cfff] text-purple-700 border border-purple-200 shadow-md hover:from-[#e0cfff] hover:to-[#f5eafe] hover:text-purple-800 hover:border-purple-300"
-            size="sm"
-            onClick={() => setIsAutoGenerateOpen(true)}
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            Auto-Generate
-          </Button>
-          <Button className="bg-sylvia-600 hover:bg-sylvia-700" size="sm" onClick={() => setIsAddQuestionOpen(true)}>
-            + Add Question
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2">
+            <Button
+              className="bg-gradient-to-r from-[#f5eafe] to-[#e0cfff] text-purple-700 border border-purple-200 shadow-md hover:from-[#e0cfff] hover:to-[#f5eafe] hover:text-purple-800 hover:border-purple-300"
+              size="sm"
+              onClick={() => setIsAutoGenerateOpen(true)}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Auto-Generate
+            </Button>
+            <Button className="bg-sylvia-600 hover:bg-sylvia-700" size="sm" onClick={() => setIsAddQuestionOpen(true)}>
+              + Add Question
+            </Button>
+          </div>
           <Button variant="outline" size="sm" onClick={handlePreviewSurvey}>
             <FileText className="mr-2 h-4 w-4" />
             Preview Survey
@@ -710,16 +712,20 @@ export default function QuestionSetPage() {
       )}
 
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
-          <TabsTrigger value="all">All Questions</TabsTrigger>
-          {sections.map((section) => (
-            <TabsTrigger key={section} value={section.toLowerCase()}>
-              {section}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="tabs-container overflow-x-auto pb-2 -mx-4 px-4">
+          <TabsList className="tabs-list-responsive w-full max-w-none min-w-max gap-1" style={{ 
+            gridTemplateColumns: `repeat(${sections.length + 1}, minmax(120px, 1fr))` 
+          }}>
+            <TabsTrigger value="all" className="tabs-trigger-responsive">All Questions</TabsTrigger>
+            {sections.map((section) => (
+              <TabsTrigger key={section} value={section.toLowerCase()} className="tabs-trigger-responsive">
+                {section}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
-        <TabsContent value="all" className="mt-6">
+        <TabsContent value="all" className="mt-6 tabs-content">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>All Questions ({questions.length})</CardTitle>
@@ -793,7 +799,7 @@ export default function QuestionSetPage() {
         </TabsContent>
 
         {sections.map((section) => (
-          <TabsContent key={section} value={section.toLowerCase()} className="mt-6">
+          <TabsContent key={section} value={section.toLowerCase()} className="mt-6 tabs-content">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle>
@@ -819,7 +825,7 @@ export default function QuestionSetPage() {
                       .map((question, index) => (
                         <TableRow key={question.id}>
                           <TableCell className="font-medium">{index + 1}</TableCell>
-                          <TableCell>{question.question}</TableCell>
+                          <TableCell>{question.text}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="capitalize">
                               {question.type}

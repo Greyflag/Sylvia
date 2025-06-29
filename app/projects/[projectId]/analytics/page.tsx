@@ -399,18 +399,20 @@ export default function AnalyticsPage() {
             <p className="text-muted-foreground mt-1">View and analyze your survey results</p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="border-sylvia-300 text-sylvia-700" onClick={handleTestAIAnalysis}>
-            <Brain className="mr-2 h-4 w-4 animate-pulse" />
-            Test AI Analysis
-          </Button>
-          {showFakeAnalysis && (
-            <Button variant="ghost" className="text-sylvia-600 underline" onClick={handleDismissFakeAnalysis}>
-              Dismiss Test Analysis
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2">
+            <Button variant="outline" className="border-sylvia-300 text-sylvia-700" onClick={handleTestAIAnalysis}>
+              <Brain className="mr-2 h-4 w-4 animate-pulse" />
+              Test AI Analysis
             </Button>
-          )}
+            {showFakeAnalysis && (
+              <Button variant="ghost" className="text-sylvia-600 underline" onClick={handleDismissFakeAnalysis}>
+                Dismiss Test Analysis
+              </Button>
+            )}
+          </div>
           {!isCompleted && !showFakeAnalysis && (
-            <>
+            <div className="flex gap-2">
               <Button variant="outline">Save Draft</Button>
               <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
                 <Link href={`/projects/${projectId}`}>
@@ -418,7 +420,7 @@ export default function AnalyticsPage() {
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -681,16 +683,18 @@ export default function AnalyticsPage() {
 
           {/* Tabs for different analytics views */}
           <Tabs defaultValue="trends">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
-              <TabsTrigger value="trends">Trends</TabsTrigger>
-              <TabsTrigger value="segments">Segments</TabsTrigger>
-              <TabsTrigger value="feedback">Verbatim Feedback</TabsTrigger>
-              <TabsTrigger value="features">Feature Analysis</TabsTrigger>
-              <TabsTrigger value="churn">Churn Analysis</TabsTrigger>
-            </TabsList>
+            <div className="tabs-container overflow-x-auto pb-2 -mx-4 px-4">
+              <TabsList className="tabs-list-responsive w-full max-w-none min-w-max grid-cols-5 mb-6 gap-1">
+                <TabsTrigger value="trends" className="tabs-trigger-responsive">Trends</TabsTrigger>
+                <TabsTrigger value="segments" className="tabs-trigger-responsive">Segments</TabsTrigger>
+                <TabsTrigger value="feedback" className="tabs-trigger-responsive">Verbatim Feedback</TabsTrigger>
+                <TabsTrigger value="features" className="tabs-trigger-responsive">Feature Analysis</TabsTrigger>
+                <TabsTrigger value="churn" className="tabs-trigger-responsive">Churn Analysis</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Trends Tab */}
-            <TabsContent value="trends" className="space-y-6">
+            <TabsContent value="trends" className="space-y-6 tabs-content">
               <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                   <CardHeader>
@@ -794,7 +798,7 @@ export default function AnalyticsPage() {
             </TabsContent>
 
             {/* Segments Tab */}
-            <TabsContent value="segments" className="space-y-6">
+            <TabsContent value="segments" className="space-y-6 tabs-content">
               <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                   <CardHeader>
@@ -893,7 +897,7 @@ export default function AnalyticsPage() {
             </TabsContent>
 
             {/* Verbatim Feedback Tab */}
-            <TabsContent value="feedback" className="space-y-6">
+            <TabsContent value="feedback" className="space-y-6 tabs-content">
               <Card>
                 <CardHeader>
                   <CardTitle>Customer Quotes</CardTitle>
@@ -920,9 +924,11 @@ export default function AnalyticsPage() {
                             <Avatar className="h-6 w-6">
                               <AvatarFallback className="text-xs">
                                 {quote.author
+                                  ? quote.author
                                   .split(" ")
                                   .map((n) => n[0])
-                                  .join("")}
+                                      .join("")
+                                  : "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-sm">
@@ -1010,7 +1016,7 @@ export default function AnalyticsPage() {
             </TabsContent>
 
             {/* Feature Analysis Tab */}
-            <TabsContent value="features" className="space-y-6">
+            <TabsContent value="features" className="space-y-6 tabs-content">
               <Card>
                 <CardHeader>
                   <CardTitle>Feature Usage</CardTitle>
@@ -1082,7 +1088,7 @@ export default function AnalyticsPage() {
             </TabsContent>
 
             {/* Churn Analysis Tab */}
-            <TabsContent value="churn" className="space-y-6">
+            <TabsContent value="churn" className="space-y-6 tabs-content">
               <div className="grid gap-6 md:grid-cols-2">
                 <Card className="h-full min-h-[340px]">
                   <CardHeader>
@@ -1158,9 +1164,11 @@ export default function AnalyticsPage() {
                             <Avatar className="h-6 w-6">
                               <AvatarFallback className="text-xs">
                                 {quote.author
+                                  ? quote.author
                                   .split(" ")
                                   .map((n) => n[0])
-                                  .join("")}
+                                      .join("")
+                                  : "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-sm">

@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 
 export type Project = {
   id: string
@@ -52,21 +52,6 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [currentProject, setCurrentProject] = useState<Project | null>(null)
   const [allProjects, setAllProjects] = useState<Project[]>(initialProjects)
-  const [isInitialized, setIsInitialized] = useState(false)
-
-  useEffect(() => {
-    // Set current project based on URL if needed
-    const path = window.location.pathname
-    const projectIdMatch = path.match(/\/projects\/([^\/]+)/)
-    if (projectIdMatch) {
-      const projectId = projectIdMatch[1]
-      const project = allProjects.find(p => p.id === projectId)
-      if (project) {
-        setCurrentProject(project)
-      }
-    }
-    setIsInitialized(true)
-  }, [])
 
   // Function to add a new project
   const addProject = (project: Project) => {
@@ -116,10 +101,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const isValidProjectId = (id: string | undefined): boolean => {
     if (!id || id === "undefined") return false
     return allProjects.some((project) => project.id === id)
-  }
-
-  if (!isInitialized) {
-    return null // or a loading state
   }
 
   return (

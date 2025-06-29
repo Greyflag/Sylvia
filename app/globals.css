@@ -139,3 +139,49 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
+
+/* Custom tab styles for better spacing and responsiveness */
+.tabs-container {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.tabs-list-responsive {
+  display: grid;
+  min-width: max-content;
+  gap: 0.25rem;
+}
+
+.tabs-trigger-responsive {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Ensure proper spacing for long tab names */
+.tabs-trigger-responsive[data-state="active"] {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Animation for smooth transitions */
+.tabs-content {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

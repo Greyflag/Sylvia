@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -36,7 +36,7 @@ import { useToast } from "@/components/ui/use-toast"
 export default function ContactsPage() {
   const params = useParams()
   const projectId = params.projectId as string
-  const { currentProject } = useProject()
+  const { currentProject, setCurrentProject, allProjects } = useProject()
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -53,6 +53,14 @@ export default function ContactsPage() {
   const { toast } = useToast()
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewContact, setViewContact] = useState<any>(null)
+
+  useEffect(() => {
+    // Set current project based on projectId
+    const project = allProjects.find(p => p.id === projectId)
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [projectId, allProjects, setCurrentProject])
 
   // Get contacts for this project
   const contacts = getProjectContacts(projectId)
@@ -453,9 +461,11 @@ export default function ContactsPage() {
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-sylvia-100 text-sylvia-700">
                             {contact.name
+                              ? contact.name
                               .split(" ")
                               .map((n) => n[0])
-                              .join("")}
+                                  .join("")
+                              : "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -578,9 +588,11 @@ export default function ContactsPage() {
                 <Avatar className="h-16 w-16">
                   <AvatarFallback className="bg-sylvia-100 text-sylvia-700 text-xl">
                     {viewContact.name
+                      ? viewContact.name
                       .split(" ")
                       .map((n) => n[0])
-                      .join("")}
+                          .join("")
+                      : "U"}
                   </AvatarFallback>
                 </Avatar>
                 <div>

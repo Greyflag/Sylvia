@@ -34,8 +34,16 @@ export default function OutreachCampaignPage() {
   const params = useParams()
   const pathname = usePathname()
   const projectId = params.projectId as string
-  const { currentProject } = useProject()
+  const { currentProject, setCurrentProject, allProjects } = useProject()
   const [responders, setResponders] = useState<any[]>([])
+
+  useEffect(() => {
+    // Set current project based on projectId
+    const project = allProjects.find(p => p.id === projectId)
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [projectId, allProjects, setCurrentProject])
 
   useEffect(() => {
     // Load responses for the current project
@@ -100,7 +108,7 @@ export default function OutreachCampaignPage() {
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/projects/${projectId}`}>
+            <Link href={`/projects/${projectId}/objectives`}>
               <ChevronLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -119,32 +127,49 @@ export default function OutreachCampaignPage() {
         </div>
       </div>
 
-      {/* Progress Bar - now full width, always visible, with vertical space */}
+      {/* Enhanced Progress Bar with better connections */}
       <div className="w-full py-8">
-        <div className="flex items-center justify-between gap-0">
+        <div className="relative">
+          {/* Background connecting line */}
+          <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 z-0" />
+          
+          <div className="flex items-center justify-between gap-0 relative z-10">
           {steps.map((step, index) => (
             <div key={step.name} className="flex-1 flex flex-col items-center relative">
               <div
                 className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-full text-base font-bold z-10 mb-2",
+                    "flex items-center justify-center w-10 h-10 rounded-full text-base font-bold z-10 mb-2 border-2 transition-all duration-200",
                   step.completed
-                    ? "bg-green-100 text-green-700 border border-green-200"
-                    : "bg-gray-100 text-gray-500 border border-gray-200",
+                      ? "bg-green-500 text-white border-green-500 shadow-lg"
+                      : "bg-white text-gray-500 border-gray-300",
                 )}
               >
-                {index + 1}
+                  {step.completed ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    index + 1
+                  )}
               </div>
-              {/* Connector line except for last step */}
+                
+                {/* Progress line to next step */}
               {index < steps.length - 1 && (
                 <div className="absolute top-5 left-1/2 w-full h-0.5 z-0" style={{ right: '-50%', left: '50%' }}>
-                  <div className={cn("h-0.5", step.completed ? "bg-green-200" : "bg-gray-200")} style={{ width: '100%' }} />
+                    <div 
+                      className={cn(
+                        "h-0.5 transition-all duration-300", 
+                        step.completed ? "bg-green-500" : "bg-gray-200"
+                      )} 
+                      style={{ width: '100%' }} 
+                    />
                 </div>
               )}
+                
               <div className="mt-2 text-xs font-medium text-center whitespace-nowrap" style={{ minWidth: 90 }}>
                 {step.name}
               </div>
             </div>
           ))}
+          </div>
         </div>
       </div>
 
@@ -405,14 +430,16 @@ export default function OutreachCampaignPage() {
                                 <Avatar>
                                   <AvatarFallback>
                                     {responder.name
+                                      ? responder.name
                                       .split(" ")
                                       .map((n: string) => n[0])
-                                      .join("")}
+                                          .join("")
+                                      : "U"}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium">{responder.name}</div>
-                                  <div className="text-sm text-muted-foreground">{responder.email}</div>
+                                  <div className="font-medium">{responder.name || "Unknown"}</div>
+                                  <div className="text-sm text-muted-foreground">{responder.email || "No email"}</div>
                                 </div>
                               </div>
                             </TableCell>

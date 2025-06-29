@@ -49,7 +49,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function ProjectDashboard() {
   const params = useParams()
   const projectId = params.projectId as string
-  const { currentProject, setCurrentProject } = useProject()
+  const { currentProject, setCurrentProject, allProjects } = useProject()
   const [isLoading, setIsLoading] = useState(true)
   const [projectData, setProjectData] = useState({
     analytics: null,
@@ -61,6 +61,14 @@ export default function ProjectDashboard() {
   const [aiLoadingStep, setAILoadingStep] = useState(0)
   const [isAutoGenerateOpen, setIsAutoGenerateOpen] = useState(false)
   const [autoGenerateInput, setAutoGenerateInput] = useState("")
+
+  useEffect(() => {
+    // Set current project based on projectId
+    const project = allProjects.find(p => p.id === projectId)
+    if (project) {
+      setCurrentProject(project)
+    }
+  }, [projectId, allProjects, setCurrentProject])
 
   useEffect(() => {
     // Fetch project data
@@ -506,8 +514,8 @@ export default function ProjectDashboard() {
               </div>
               <Progress value={currentProject.progress} className="h-2" />
 
-              <div className="grid gap-4 mt-6">
-                <div className="flex items-start gap-3 p-3 rounded-lg border bg-white/50">
+              <div className="space-y-0 mt-6">
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-white/50 relative">
                   <div className="bg-sylvia-100 text-sylvia-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
                     1
                   </div>
@@ -523,9 +531,11 @@ export default function ProjectDashboard() {
                       </Link>
                     </Button>
                   </div>
+                  {/* Connecting line */}
+                  <div className="absolute left-3 top-8 w-0.5 h-8 bg-gray-200" />
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50 relative">
                   <div className="bg-gray-200 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
                     2
                   </div>
@@ -535,9 +545,11 @@ export default function ProjectDashboard() {
                       Design questions that will help you achieve your objectives
                     </p>
                   </div>
+                  {/* Connecting line */}
+                  <div className="absolute left-3 top-8 w-0.5 h-8 bg-gray-200" />
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50 relative">
                   <div className="bg-gray-200 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
                     3
                   </div>
@@ -547,16 +559,46 @@ export default function ProjectDashboard() {
                       Import or manually add the customers you want to survey
                     </p>
                   </div>
+                  {/* Connecting line */}
+                  <div className="absolute left-3 top-8 w-0.5 h-8 bg-gray-200" />
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50 relative">
                   <div className="bg-gray-200 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
                     4
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-600">Create Outreach Material</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Design email templates and outreach materials
+                    </p>
+                  </div>
+                  {/* Connecting line */}
+                  <div className="absolute left-3 top-8 w-0.5 h-8 bg-gray-200" />
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50 relative">
+                  <div className="bg-gray-200 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
+                    5
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-600">Launch Your Campaign</h3>
                     <p className="text-sm text-gray-500 mt-1">
                       Send your survey and start collecting valuable feedback
+                    </p>
+                  </div>
+                  {/* Connecting line */}
+                  <div className="absolute left-3 top-8 w-0.5 h-8 bg-gray-200" />
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                  <div className="bg-gray-200 text-gray-600 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-medium">
+                    6
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-600">Analyze Results</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Review insights and generate reports from your survey data
                     </p>
                   </div>
                 </div>
