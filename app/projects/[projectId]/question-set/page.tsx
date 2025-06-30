@@ -645,16 +645,9 @@ export default function QuestionSetPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
-            <Link href={`/projects/${projectId}`}>
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Question Set</h1>
-            <p className="text-muted-foreground mt-1">Design and manage your survey questions</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">Question Set</h1>
+          <p className="text-muted-foreground mt-1">Design and manage your survey questions</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2">

@@ -43,8 +43,8 @@ export default function NewProjectPage() {
       addProject(newProject)
       setCurrentProject(newProject)
 
-      // Redirect to the new project
-      router.push(`/projects/${newProject.id}`)
+      // Redirect to the objectives page to start the project
+      router.push(`/projects/${newProject.id}/objectives`)
     } catch (error) {
       console.error('Error creating project:', error)
       setIsSubmitting(false)

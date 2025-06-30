@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { BarChart3, ClipboardList, FileText, Mail, Target, Users, Zap, CheckCircle } from "lucide-react"
 import type { Project } from "@/components/project-context"
+import { useProject } from "@/components/project-context"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   projectId: string
@@ -15,9 +16,10 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className, projectId, project }: SidebarProps) {
   const pathname = usePathname()
+  const { isHydrated } = useProject()
 
   // Safety check
-  if (!project || !projectId || projectId === "undefined") {
+  if (!project || !projectId || projectId === "undefined" || !isHydrated) {
     return null
   }
 

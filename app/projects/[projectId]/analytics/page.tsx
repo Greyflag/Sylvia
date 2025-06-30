@@ -31,6 +31,7 @@ import {
   ChevronRight,
   Search,
   Loader2,
+  CheckCircle,
 } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -59,13 +60,14 @@ import Link from "next/link"
 export default function AnalyticsPage() {
   const params = useParams()
   const projectId = params.projectId as string
-  const { currentProject } = useProject()
+  const { currentProject, setCurrentProject, allProjects, updateProject } = useProject()
   const [openInsight, setOpenInsight] = useState<string | null>("satisfaction")
   const [selectedObjective, setSelectedObjective] = useState<string>("all")
   const [showFakeAnalysis, setShowFakeAnalysis] = useState(false)
   const [isAILoading, setIsAILoading] = useState(false)
   const [aiLoadingStep, setAILoadingStep] = useState(0)
-  const [fakeAnalytics, setFakeAnalytics] = useState<any | null>(null)
+  const [fakeAnalytics, setFakeAnalytics] = useState<any>(null)
+  const [projectJustCompleted, setProjectJustCompleted] = useState(false)
   const analyticsRef = useRef<any>(null)
 
   // Get analytics data for this project
@@ -368,6 +370,21 @@ export default function AnalyticsPage() {
         completionRate: 91,
         responseRate: 80,
       })
+      
+      // Update project progress to 100% and mark as completed
+      if (currentProject) {
+        updateProject(projectId, {
+          progress: 100,
+          status: "completed",
+          updatedAt: new Date().toISOString(),
+        })
+        
+        // Set flag to show completion banner
+        setProjectJustCompleted(true)
+        
+        // Show success notification
+        console.log("🎉 Project completed! All navigation steps are now green.")
+      }
     }, 7800)
   }
 
@@ -376,28 +393,28 @@ export default function AnalyticsPage() {
     return () => {
       setFakeAnalytics(null)
       analyticsRef.current = null
+      setProjectJustCompleted(false)
     }
   }, [])
+
+  // Reset projectJustCompleted when currentProject changes
+  useEffect(() => {
+    setProjectJustCompleted(false)
+  }, [currentProject?.id])
 
   // Optionally, add a button to dismiss fake analysis and restore original analytics
   const handleDismissFakeAnalysis = () => {
     setShowFakeAnalysis(false)
     setFakeAnalytics(null)
+    setProjectJustCompleted(false)
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
-            <Link href={`/projects/${projectId}`}>
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Analytics & Reporting</h1>
-            <p className="text-muted-foreground mt-1">View and analyze your survey results</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">Analytics & Reporting</h1>
+          <p className="text-muted-foreground mt-1">View and analyze your survey results</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2">
@@ -414,12 +431,6 @@ export default function AnalyticsPage() {
           {!isCompleted && !showFakeAnalysis && (
             <div className="flex gap-2">
               <Button variant="outline">Save Draft</Button>
-              <Button asChild className="bg-sylvia-600 hover:bg-sylvia-700">
-                <Link href={`/projects/${projectId}`}>
-                  Back to Project
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
           )}
         </div>
@@ -456,31 +467,48 @@ export default function AnalyticsPage() {
 
       {/* Fake AI Analysis Card */}
       {showFakeAnalysis && (
-        <Card className="border-2 border-sylvia-300 shadow-lg bg-gradient-to-br from-purple-50 to-sylvia-50 animate-fade-in">
-          <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <Brain className="h-7 w-7 text-sylvia-600 animate-pulse" />
-            <CardTitle className="text-2xl text-sylvia-900">Sylvia AI Deep Analysis</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-2">
-            <div className="text-lg font-semibold text-sylvia-700">Key Findings</div>
-            <ul className="list-disc pl-6 space-y-2 text-sylvia-800">
-              <li><b>Hidden Churn Risk:</b> Advanced pattern detection identified a 17% churn risk among mid-market customers, primarily driven by delayed feature adoption and low engagement in the first 60 days.</li>
-              <li><b>Sentiment Hotspots:</b> Sentiment analysis revealed that "support" and "integration" are the most polarizing topics, with 68% positive and 32% negative sentiment split. Negative comments cluster around onboarding complexity and response times.</li>
-              <li><b>Feature Impact:</b> Customers who used the new dashboard feature at least 3 times per week reported a 1.2-point higher satisfaction score and were 2.5x more likely to recommend the product.</li>
-              <li><b>Predictive NPS:</b> AI regression modeling predicts a 9-point NPS increase if documentation and onboarding are improved, with the largest impact among technical users.</li>
-              <li><b>Engagement Drop-off:</b> 24% of users show a sharp engagement drop after the first month, correlating with a lack of personalized follow-up and unclear value communication.</li>
-            </ul>
-            <div className="text-lg font-semibold text-sylvia-700 mt-6">AI Recommendations</div>
-            <ol className="list-decimal pl-6 space-y-2 text-sylvia-800">
-              <li>Launch a targeted onboarding campaign for new users, focusing on integration and support resources.</li>
-              <li>Develop a "quick wins" dashboard tour to drive early feature adoption and reduce first-month churn.</li>
-              <li>Expand documentation with technical deep-dives and real-world use cases, prioritizing feedback from detractors.</li>
-              <li>Implement proactive support check-ins for accounts with low engagement in the first 30 days.</li>
-              <li>Leverage promoters for testimonials and peer-led webinars to amplify positive sentiment and NPS.</li>
-            </ol>
-            <div className="text-xs text-gray-500 mt-4">This analysis is for demonstration purposes and does not affect your real analytics data.</div>
-          </CardContent>
-        </Card>
+        <>
+          {projectJustCompleted && (
+            <Card className="border-2 border-green-300 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 animate-fade-in">
+              <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                <CheckCircle className="h-7 w-7 text-green-600" />
+                <CardTitle className="text-2xl text-green-900">Project Completed! 🎉</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <p className="text-green-800">
+                  Congratulations! Your project has been marked as completed. All navigation steps in the sidebar are now green, 
+                  indicating that you've successfully completed the entire survey workflow.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          
+          <Card className="border-2 border-sylvia-300 shadow-lg bg-gradient-to-br from-purple-50 to-sylvia-50 animate-fade-in">
+            <CardHeader className="flex flex-row items-center gap-4 pb-2">
+              <Brain className="h-7 w-7 text-sylvia-600 animate-pulse" />
+              <CardTitle className="text-2xl text-sylvia-900">Sylvia AI Deep Analysis</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-2">
+              <div className="text-lg font-semibold text-sylvia-700">Key Findings</div>
+              <ul className="list-disc pl-6 space-y-2 text-sylvia-800">
+                <li><b>Hidden Churn Risk:</b> Advanced pattern detection identified a 17% churn risk among mid-market customers, primarily driven by delayed feature adoption and low engagement in the first 60 days.</li>
+                <li><b>Sentiment Hotspots:</b> Sentiment analysis revealed that "support" and "integration" are the most polarizing topics, with 68% positive and 32% negative sentiment split. Negative comments cluster around onboarding complexity and response times.</li>
+                <li><b>Feature Impact:</b> Customers who used the new dashboard feature at least 3 times per week reported a 1.2-point higher satisfaction score and were 2.5x more likely to recommend the product.</li>
+                <li><b>Predictive NPS:</b> AI regression modeling predicts a 9-point NPS increase if documentation and onboarding are improved, with the largest impact among technical users.</li>
+                <li><b>Engagement Drop-off:</b> 24% of users show a sharp engagement drop after the first month, correlating with a lack of personalized follow-up and unclear value communication.</li>
+              </ul>
+              <div className="text-lg font-semibold text-sylvia-700 mt-6">AI Recommendations</div>
+              <ol className="list-decimal pl-6 space-y-2 text-sylvia-800">
+                <li>Launch a targeted onboarding campaign for new users, focusing on integration and support resources.</li>
+                <li>Develop a "quick wins" dashboard tour to drive early feature adoption and reduce first-month churn.</li>
+                <li>Expand documentation with technical deep-dives and real-world use cases, prioritizing feedback from detractors.</li>
+                <li>Implement proactive support check-ins for accounts with low engagement in the first 30 days.</li>
+                <li>Leverage promoters for testimonials and peer-led webinars to amplify positive sentiment and NPS.</li>
+              </ol>
+              <div className="text-xs text-gray-500 mt-4">This analysis is for demonstration purposes and does not affect your real analytics data.</div>
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {/* Only show No Data Available if not completed and not showing fake analysis */}

@@ -11,8 +11,31 @@ import { Sidebar } from "./sidebar"
 export function Header() {
   const pathname = usePathname()
   const params = useParams()
-  const { currentProject } = useProject()
+  const { currentProject, isHydrated } = useProject()
   const projectId = params.projectId as string
+
+  // Wait for hydration to complete
+  if (!isHydrated) {
+    return (
+      <header className="sticky top-0 z-50 flex h-16 items-center px-6 border-b bg-white/80 backdrop-blur-sm">
+        <div className="flex items-center gap-4 lg:gap-6">
+          <div className="flex items-center gap-2">
+            <div className="bg-sylvia-600 text-white p-1 rounded-md">
+              <Zap className="h-4 w-4" />
+            </div>
+            <span className="text-lg font-bold tracking-tight">
+              Sylvia<span className="text-sylvia-600">VOC</span>
+            </span>
+          </div>
+        </div>
+        <div className="ml-auto">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-32"></div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   // Determine if we're in a project view
   const isProjectView = !!projectId && !!currentProject
@@ -24,7 +47,6 @@ export function Header() {
     }
 
     // Project specific paths
-    if (pathname === `/projects/${projectId}`) return "Project Dashboard"
     if (pathname === `/projects/${projectId}/objectives`) return "Define Objectives"
     if (pathname === `/projects/${projectId}/question-set`) return "Question Set Generation"
     if (pathname === `/projects/${projectId}/contacts`) return "Contact List Management"

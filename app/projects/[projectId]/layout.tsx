@@ -11,37 +11,36 @@ export default function ProjectLayout({
   children: React.ReactNode
 }) {
   const { projectId } = useParams()
-  const { allProjects, setCurrentProject } = useProject()
-  const [isLoading, setIsLoading] = useState(true)
+  const { allProjects, currentProject, setCurrentProject, isHydrated } = useProject()
 
   useEffect(() => {
-    if (allProjects.length > 0) {
+    if (isHydrated) {
       const project = allProjects.find((p) => p.id === projectId)
       if (project) {
         setCurrentProject(project)
       }
-      setIsLoading(false)
     }
-  }, [allProjects, projectId, setCurrentProject])
+  }, [projectId, allProjects, setCurrentProject, isHydrated])
 
-  if (isLoading) {
+  // Wait for hydration to complete
+  if (!isHydrated) {
     return (
-      <div className="flex h-screen">
-        <Sidebar projectId={projectId} project={allProjects.find((p) => p.id === projectId)} />
-        <main className="flex-1 p-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-        </main>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sylvia-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading project...</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="flex h-screen">
-      <Sidebar projectId={projectId} project={allProjects.find((p) => p.id === projectId)} />
+      <Sidebar 
+        key={`${currentProject?.id}-${currentProject?.progress}-${currentProject?.status}`}
+        projectId={projectId} 
+        project={currentProject || allProjects.find((p) => p.id === projectId)} 
+      />
       <main className="flex-1 p-8">{children}</main>
     </div>
   )

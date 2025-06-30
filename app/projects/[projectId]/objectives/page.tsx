@@ -221,13 +221,7 @@ export default function ObjectivesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" asChild>
-            <Link href={`/projects/${projectId}`}>
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
+        <div>
           <h1 className="text-3xl font-bold flex items-center gap-4">
             <div className="bg-sylvia-600 text-white w-10 h-10 rounded-lg flex items-center justify-center">
               <Target className="h-5 w-5" />
@@ -236,7 +230,6 @@ export default function ObjectivesPage() {
           </h1>
           <p className="text-muted-foreground mt-2">Set clear goals and KPIs for your Voice of Customer survey</p>
         </div>
-      </div>
 
       {/* Progress Indicator */}
       <div className="flex items-center gap-4">

@@ -38,9 +38,21 @@ const formatDate = (dateString: string) => {
 }
 
 export default function ProjectsDashboard() {
-  const { allProjects, archiveProject, duplicateProject } = useProject()
+  const { allProjects, archiveProject, duplicateProject, isHydrated } = useProject()
   const router = useRouter()
   const [projectToArchive, setProjectToArchive] = useState<string | null>(null)
+
+  // Wait for hydration to complete
+  if (!isHydrated) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sylvia-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading projects...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Calculate summary statistics
   const completedProjects = allProjects.filter((p) => p.status === "completed").length
@@ -178,8 +190,8 @@ export default function ProjectsDashboard() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/projects/${project.id}`}>View Project</Link>
+                      <DropdownMenuItem onClick={() => router.push(`/projects/${project.id}/objectives`)}>
+                        View Project
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDuplicateProject(project.id)}>
                         Duplicate Project
@@ -231,7 +243,7 @@ export default function ProjectsDashboard() {
                   {project.progress === 0 ? (
                     <Button 
                       className="w-full bg-sylvia-600 hover:bg-sylvia-700"
-                      onClick={() => router.push(`/projects/${project.id}`)}
+                      onClick={() => router.push(`/projects/${project.id}/objectives`)}
                     >
                       Start Project
                     </Button>
@@ -239,7 +251,7 @@ export default function ProjectsDashboard() {
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={() => router.push(`/projects/${project.id}`)}
+                      onClick={() => router.push(`/projects/${project.id}/objectives`)}
                     >
                       View Project
                     </Button>

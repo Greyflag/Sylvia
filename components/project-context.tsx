@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
 export type Project = {
   id: string
@@ -22,6 +22,8 @@ type ProjectContextType = {
   duplicateProject: (projectId: string) => void
   getArchivedProjects: () => Project[]
   deleteProject: (projectId: string) => void
+  updateProject: (projectId: string, updates: Partial<Project>) => void
+  isHydrated: boolean
 }
 
 // Initial projects array with one completed project and one blank project
@@ -51,7 +53,14 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [currentProject, setCurrentProject] = useState<Project | null>(null)
-  const [allProjects, setAllProjects] = useState<Project[]>(initialProjects)
+  const [allProjects, setAllProjects] = useState<Project[]>([])
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Initialize projects on client side to prevent hydration mismatch
+  useEffect(() => {
+    setAllProjects(initialProjects)
+    setIsHydrated(true)
+  }, [])
 
   // Function to add a new project
   const addProject = (project: Project) => {
@@ -103,6 +112,21 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     return allProjects.some((project) => project.id === id)
   }
 
+  // Function to update a project
+  const updateProject = (projectId: string, updates: Partial<Project>) => {
+    setAllProjects((prev) => {
+      const updated = prev.map((project) =>
+        project.id === projectId ? { ...project, ...updates } : project
+      )
+      return updated
+    })
+    
+    if (currentProject?.id === projectId) {
+      const updatedCurrentProject = { ...currentProject, ...updates }
+      setCurrentProject(updatedCurrentProject)
+    }
+  }
+
   return (
     <ProjectContext.Provider
       value={{
@@ -115,6 +139,8 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         duplicateProject,
         getArchivedProjects,
         deleteProject,
+        updateProject,
+        isHydrated,
       }}
     >
       {children}

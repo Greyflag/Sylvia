@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useRouter } from "next/navigation"
 
 // Add date formatting utility
 const formatDate = (dateString: string) => {
@@ -37,15 +38,18 @@ const formatDate = (dateString: string) => {
 }
 
 export default function ArchivedProjectsPage() {
-  const { getArchivedProjects, deleteProject } = useProject()
+  const { getArchivedProjects, deleteProject, isHydrated } = useProject()
   const [archivedProjects, setArchivedProjects] = useState<ReturnType<typeof getArchivedProjects>>([])
   const [isClient, setIsClient] = useState(false)
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     setIsClient(true)
-    setArchivedProjects(getArchivedProjects())
-  }, [getArchivedProjects])
+    if (isHydrated) {
+      setArchivedProjects(getArchivedProjects())
+    }
+  }, [getArchivedProjects, isHydrated])
 
   const handleDeleteProject = (projectId: string) => {
     setProjectToDelete(projectId)
@@ -64,8 +68,16 @@ export default function ArchivedProjectsPage() {
     ? archivedProjects.find((p) => p.id === projectToDelete)
     : null
 
-  if (!isClient) {
-    return null // or a loading state
+  // Wait for hydration to complete
+  if (!isHydrated || !isClient) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sylvia-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading archived projects...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -129,15 +141,15 @@ export default function ArchivedProjectsPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/projects/${project.id}`}>View Project</Link>
+                    <DropdownMenuItem onClick={() => router.push(`/projects/${project.id}/objectives`)}>
+                      View Project
                     </DropdownMenuItem>
+                    <DropdownMenuItem>Export Data</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="text-red-600"
                       onClick={() => handleDeleteProject(project.id)}
                     >
-                      <Trash2 className="mr-2 h-4 w-4" />
                       Delete Project
                     </DropdownMenuItem>
                   </DropdownMenuContent>
