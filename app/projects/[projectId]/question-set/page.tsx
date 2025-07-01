@@ -382,15 +382,15 @@ export default function QuestionSetPage() {
       const questions5 = [
         {
           id: "q1",
-          text: "How satisfied are you with our product overall?",
+          text: "How would you rate your overall experience with our platform?",
           type: "multiple-choice",
           section: "General",
           required: true,
-          options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"],
+          options: ["Excellent", "Good", "Average", "Poor", "Very poor"],
         },
         {
           id: "q2",
-          text: "What is the primary reason for your satisfaction or dissatisfaction?",
+          text: "What specific aspect of our service exceeded your expectations?",
           type: "open-ended",
           section: "General",
           required: false,
@@ -398,23 +398,23 @@ export default function QuestionSetPage() {
         },
         {
           id: "q3",
-          text: "How likely are you to recommend our product to others?",
+          text: "Would you consider using our platform again in the future?",
           type: "multiple-choice",
           section: "General",
           required: true,
-          options: ["Very likely", "Likely", "Neutral", "Unlikely", "Very unlikely"],
+          options: ["Definitely yes", "Probably yes", "Not sure", "Probably not", "Definitely not"],
         },
         {
           id: "q4",
-          text: "Which feature do you use the most?",
+          text: "Which of our core features did you find most valuable?",
           type: "multiple-choice",
-          section: "Usage",
+          section: "Features",
           required: false,
-          options: ["Feature A", "Feature B", "Feature C", "Feature D"],
+          options: ["Data Analytics", "Reporting Tools", "Integration Capabilities", "User Interface", "Customer Support"],
         },
         {
           id: "q5",
-          text: "What is one thing we could improve?",
+          text: "What was the biggest challenge you faced while using our platform?",
           type: "open-ended",
           section: "Improvement",
           required: false,
@@ -424,166 +424,167 @@ export default function QuestionSetPage() {
       const questions10 = [
         {
           id: "intro-1",
-          text: "Thank you for taking our survey! We are always looking to improve our customer experience in an effort to better support organizations like yours. To that end, we are hoping to collect feedback from former customers like you to help inform our approach. We expect this survey will take 10-15 minutes to complete. Please answer as candidly and transparently as possible—we want to hear the 'hard truth' so we can improve! (Incentive information will be provided at the end of the survey.) To begin, please enter the email address this survey invitation was sent to—this will help ensure you don't receive repeat requests to participate.",
+          text: "Welcome to our feedback survey! We value your insights to improve our services. This survey will take approximately 8-12 minutes to complete. Your responses will help us understand how we can better serve organizations like yours. Please provide honest feedback - we appreciate both positive experiences and areas for improvement. To begin, please confirm the email address associated with your account.",
           type: "open-ended",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: true,
           options: [],
         },
         {
           id: "intro-2",
-          text: "Which best describes your current title at your organization?",
+          text: "What is your primary role within your organization?",
           type: "multiple-choice",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: true,
           options: [
-            "Prospect Researcher (e.g. Research Analyst)",
-            "Fundraiser (e.g. Major Gift Officer, Development Associate)",
-            "Leadership (e.g. VP of Development, Executive Director, Director of Research)",
-            "Grant Writer (e.g. Grant Proposal Manager, Grant Coordinator)",
-            "Marketer/Communications (e.g. Marketing Associate, Communications Manager)",
-            "IT / Database Management (e.g. Database Administrator)",
-            "Other:"
+            "Data Analyst",
+            "Business Development Manager",
+            "Executive Leadership",
+            "Operations Manager",
+            "Marketing Specialist",
+            "IT Administrator",
+            "Research Coordinator",
+            "Other"
           ],
         },
         {
           id: "intro-3",
-          text: "What was your personal involvement / usage of [ClientCompany] when your organization was subscribed / using it? Please check all that apply.",
+          text: "How did you primarily interact with our platform? Select all that apply.",
           type: "checkbox",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: true,
           options: [
-            '"Power" / frequent user (e.g., weekly or more)',
-            '"Light" / occasional user (e.g., monthly or less)',
-            'Budget holder/Manager',
-            "Not involved—wasn't part of my role [exclusive]",
-            "N/A—I wasn't at the organization at the time [exclusive]"
+            "Primary user - used daily/weekly",
+            "Secondary user - used occasionally",
+            "Decision maker for purchases",
+            "Administrator/manager",
+            "Technical support contact",
+            "Not directly involved"
           ],
         },
         {
           id: "intro-4",
-          text: "What was your involvement in decisions / evaluations around [ClientCompany]? (E.g., the initial evaluation and selection of [ClientCompany], renewal decisions, etc.)",
+          text: "What was your level of involvement in the platform evaluation and selection process?",
           type: "multiple-choice",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: true,
           options: [
-            "Final decision-maker",
-            "Decision influencer",
-            "Visibility (but no influence)",
-            "Wasn't involved at the time, but would be involved today",
-            "Wasn't involved at the time and wouldn't be today"
+            "Primary decision maker",
+            "Influenced the decision",
+            "Provided input but didn't decide",
+            "Was informed of the decision",
+            "Not involved in the process"
           ],
         },
         {
           id: "intro-5",
-          text: "What was your organization's total contribution revenue / donation volume in 2024?",
+          text: "What is your organization's annual budget for technology solutions?",
           type: "multiple-choice",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: true,
           options: [
-            "Under $250K",
-            "$250K-$499K",
-            "$500K-$999K",
-            "$1M-$1.4M",
-            "$1.5M-$1.9M",
-            "$2M - $2.9M",
-            "$3M-$4.9M",
-            "$5M-$9.9M",
-            "$10M or more"
+            "Under $50K",
+            "$50K-$100K",
+            "$100K-$250K",
+            "$250K-$500K",
+            "$500K-$1M",
+            "$1M-$2M",
+            "$2M-$5M",
+            "Over $5M"
           ],
         },
         {
           id: "intro-6",
-          text: "Please fill in the blank: 'Roughly speaking, our organization defines gifts of ______ or higher to be 'major gifts.'",
+          text: "How would you describe your organization's technology adoption approach?",
           type: "open-ended",
-          section: "Introduction + Screeners",
+          section: "Introduction",
           required: false,
           options: [],
         },
         {
-          id: "churn-1",
-          text: "When did your organization first start using [ClientCompany]?",
+          id: "experience-1",
+          text: "When did your organization first implement our platform?",
           type: "multiple-choice",
-          section: "[ClientCompany] churn",
+          section: "Platform Experience",
           required: true,
           options: [
-            "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017 or earlier", "Uncertain"
+            "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017 or earlier", "Don't remember"
           ],
         },
         {
-          id: "churn-2",
-          text: "When did your organization discontinue your [ClientCompany] subscription?",
+          id: "experience-2",
+          text: "When did your organization stop using our platform?",
           type: "open-ended",
-          section: "[ClientCompany] churn",
+          section: "Platform Experience",
           required: false,
           options: [],
         },
         {
-          id: "churn-3",
-          text: "Why did your organization discontinue your [ClientCompany] subscription? Please be as detailed and candid as you can. We really appreciate transparent feedback.",
+          id: "experience-3",
+          text: "What were the main reasons your organization decided to discontinue using our platform? Please be specific and detailed in your response.",
           type: "open-ended",
-          section: "[ClientCompany] churn",
+          section: "Platform Experience",
           required: false,
           options: [],
         },
         {
-          id: "churn-4",
-          text: "Why did your organization discontinue your [ClientCompany] subscription? Please take your time and check all that apply.",
+          id: "experience-4",
+          text: "Which factors contributed to your organization's decision to stop using our platform? Select all that apply.",
           type: "checkbox",
-          section: "[ClientCompany] churn",
+          section: "Platform Experience",
           required: false,
           options: [
-            "Budget constraints – too expensive for our org.",
-            "Value considerations – didn't think we were getting enough 'bang for the buck' to justify keeping it",
-            "Dissatisfied – bad experience with the product and/or service",
-            "Mismatch – realized our organization wasn't really the right fit/profile for [ClientCompany] or that [ClientCompany] wasn't quite what we thought",
-            '"Failure to launch" – we never managed to fully implement the solution / our people never really adopted it or grooved in',
-            "Key user / advocate of the solution left the org.",
-            "New leadership of the solution left the org.",
-            "Episodic demand – we needed [ClientCompany] for a specific period of time, but we just don't need that kind of solution anymore",
-            "Found an alternative solution(s) we preferred",
-            "Other: write-in",
-            "Our organization stopped fundraising operations altogether"
+            "Cost was too high relative to value received",
+            "Platform didn't meet our specific needs",
+            "Poor user experience or difficult to use",
+            "Lack of necessary features or functionality",
+            "Integration issues with existing systems",
+            "Poor customer support or service",
+            "Organizational changes or restructuring",
+            "Found a better alternative solution",
+            "Reduced need for this type of platform",
+            "Technical problems or reliability issues",
+            "Other"
           ],
         },
       ];
       const questions15 = [
         ...questions10,
         {
-          id: "extra-1",
-          text: "How frequently do you use our product or service?",
+          id: "usage-1",
+          text: "How often did you typically use our platform?",
           type: "multiple-choice",
-          section: "Usage",
+          section: "Usage Patterns",
           required: false,
-          options: ["Daily", "Weekly", "Monthly", "Rarely", "Never"],
+          options: ["Multiple times daily", "Daily", "Weekly", "Monthly", "Rarely", "Never used it"],
         },
         {
-          id: "extra-2",
-          text: "What is your favorite feature and why?",
+          id: "usage-2",
+          text: "Which specific feature or capability did you find most valuable? Please explain why.",
           type: "open-ended",
           section: "Features",
           required: false,
           options: [],
         },
         {
-          id: "extra-3",
-          text: "Have you experienced any issues or bugs? If so, please describe.",
+          id: "usage-3",
+          text: "Did you encounter any technical difficulties while using our platform? If so, please describe them.",
           type: "open-ended",
-          section: "Support",
+          section: "Technical Issues",
           required: false,
           options: [],
         },
         {
-          id: "extra-4",
-          text: "How would you rate our customer support?",
+          id: "usage-4",
+          text: "How would you rate the quality of our customer support?",
           type: "multiple-choice",
           section: "Support",
           required: false,
-          options: ["Excellent", "Good", "Average", "Poor", "Very poor"],
+          options: ["Outstanding", "Good", "Average", "Below average", "Poor"],
         },
         {
-          id: "extra-5",
-          text: "What additional features would you like to see in the future?",
+          id: "usage-5",
+          text: "What new features or improvements would have made our platform more valuable to your organization?",
           type: "open-ended",
           section: "Improvement",
           required: false,
@@ -593,42 +594,42 @@ export default function QuestionSetPage() {
       const questions20 = [
         ...questions15,
         {
-          id: "extra-6",
-          text: "How easy is it to navigate our product interface?",
+          id: "detailed-1",
+          text: "How intuitive and user-friendly did you find our platform interface?",
           type: "multiple-choice",
-          section: "Usability",
+          section: "User Experience",
           required: false,
-          options: ["Very easy", "Easy", "Neutral", "Difficult", "Very difficult"],
+          options: ["Extremely intuitive", "Very intuitive", "Somewhat intuitive", "Not very intuitive", "Very difficult to use"],
         },
         {
-          id: "extra-7",
-          text: "Have you contacted customer support in the last 6 months?",
-          type: "multiple-choice",
-          section: "Support",
-          required: false,
-          options: ["Yes", "No"],
-        },
-        {
-          id: "extra-8",
-          text: "If yes, how satisfied were you with the support received?",
+          id: "detailed-2",
+          text: "Did you contact our support team during your time using the platform?",
           type: "multiple-choice",
           section: "Support",
           required: false,
-          options: ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied"],
+          options: ["Yes, multiple times", "Yes, once or twice", "No, never needed to"],
         },
         {
-          id: "extra-9",
-          text: "What is your preferred method of communication with us?",
+          id: "detailed-3",
+          text: "If you contacted support, how satisfied were you with the resolution of your issue?",
+          type: "multiple-choice",
+          section: "Support",
+          required: false,
+          options: ["Completely satisfied", "Mostly satisfied", "Somewhat satisfied", "Not very satisfied", "Not satisfied at all"],
+        },
+        {
+          id: "detailed-4",
+          text: "What is your preferred method for receiving product updates and communications?",
           type: "multiple-choice",
           section: "Communication",
           required: false,
-          options: ["Email", "Phone", "Live Chat", "In-app Messaging", "Other"],
+          options: ["Email newsletters", "In-app notifications", "Phone calls", "Webinars", "Documentation updates", "No preference"],
         },
         {
-          id: "extra-10",
-          text: "Do you have any other comments or suggestions for us?",
+          id: "detailed-5",
+          text: "Is there anything else you'd like to share about your experience with our platform?",
           type: "open-ended",
-          section: "General Feedback",
+          section: "Additional Feedback",
           required: false,
           options: [],
         },
@@ -725,54 +726,52 @@ export default function QuestionSetPage() {
               <CardDescription>View and manage all questions in your survey</CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead>Question</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Section</TableHead>
-                    <TableHead>Required</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {questions.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12">
-                        <span className="block text-4xl text-gray-300 mb-2">?</span>
-                        <span className="font-medium text-gray-500">No questions added yet</span><br/>
-                        <span className="text-sm text-gray-400 mb-2">Get started by adding questions manually or using AI generation</span><br/>
-                        <span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-gray-300 text-gray-700 mr-2"
-                            onClick={() => setIsAutoGenerateOpen(true)}
-                          >
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Auto-Generate
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="bg-sylvia-600 hover:bg-sylvia-700 text-white"
-                            onClick={() => setIsAddQuestionOpen(true)}
-                          >
-                            + Add Manually
-                          </Button>
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
+              {questions.length === 0 ? (
+                <div className="text-center py-12">
+                  <span className="block text-4xl text-gray-300 mb-2">?</span>
+                  <span className="font-medium text-gray-500">No questions added yet</span><br/>
+                  <span className="text-sm text-gray-400 mb-2">Get started by adding questions manually or using AI generation</span><br/>
+                  <span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-gray-300 text-gray-700 mr-2"
+                      onClick={() => setIsAutoGenerateOpen(true)}
                     >
-                      <SortableContext
-                        items={questions.map((q) => q.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Auto-Generate
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-sylvia-600 hover:bg-sylvia-700 text-white"
+                      onClick={() => setIsAddQuestionOpen(true)}
+                    >
+                      + Add Manually
+                    </Button>
+                  </span>
+                </div>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={questions.map((q) => q.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px]">#</TableHead>
+                          <TableHead>Question</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Section</TableHead>
+                          <TableHead>Required</TableHead>
+                          <TableHead className="w-[100px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                         {questions.map((question, index) => (
                           <SortableTableRow
                             key={question.id}
@@ -782,11 +781,11 @@ export default function QuestionSetPage() {
                             onDelete={(id: string) => handleDeleteClick(id)}
                           />
                         ))}
-                      </SortableContext>
-                    </DndContext>
-                  )}
-                </TableBody>
-              </Table>
+                      </TableBody>
+                    </Table>
+                  </SortableContext>
+                </DndContext>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
