@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import {
   AlertCircle,
   BarChart3,
@@ -14,61 +14,80 @@ import {
   Mail,
   Users,
   Zap,
-} from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Progress } from "@/components/ui/progress"
-import { useParams, usePathname } from "next/navigation"
-import { useProject } from "@/components/project-context"
-import { getProjectResponses } from "@/lib/data-service"
-import { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
+import { useParams, usePathname } from "next/navigation";
+import { useProject } from "@/components/project-context";
+import { getProjectResponses } from "@/lib/data-service";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function OutreachCampaignPage() {
-  const params = useParams()
-  const pathname = usePathname()
-  const projectId = params.projectId as string
-  const { currentProject, setCurrentProject, allProjects } = useProject()
-  const [responders, setResponders] = useState<any[]>([])
+  const params = useParams();
+  const pathname = usePathname();
+  const projectId = params.projectId as string;
+  const { currentProject, setCurrentProject, allProjects } = useProject();
+  const [responders, setResponders] = useState<any[]>([]);
 
   useEffect(() => {
     // Set current project based on projectId
-    const project = allProjects.find(p => p.id === projectId)
+    const project = allProjects.find((p) => p.id === projectId);
     if (project) {
-      setCurrentProject(project)
+      setCurrentProject(project);
     }
-  }, [projectId, allProjects, setCurrentProject])
+  }, [projectId, allProjects, setCurrentProject]);
 
   useEffect(() => {
     // Load responses for the current project
     if (projectId) {
-      const projectResponses = getProjectResponses(projectId)
-      setResponders(projectResponses)
+      const projectResponses = getProjectResponses(projectId);
+      setResponders(projectResponses);
     }
-  }, [projectId])
+  }, [projectId]);
 
   // If current project isn't loaded yet, show a loading state
   if (!currentProject) {
-    return <div>Loading project...</div>
+    return <div>Loading project...</div>;
   }
 
   // Add after the loading check
-  const isCampaignLaunched = projectId === "enterprise-satisfaction"
-  const campaignStatus = isCampaignLaunched ? "active" : "draft"
+  const isCampaignLaunched = projectId === "enterprise-satisfaction";
+  const campaignStatus = isCampaignLaunched ? "active" : "draft";
 
   // Calculate campaign stats
-  const completedResponses = responders.filter((r) => r.status === "completed").length
-  const inProgressResponses = responders.filter((r) => r.status === "in-progress").length
-  const sentResponses = responders.filter((r) => r.status === "sent").length
-  const responseRate = responders.length > 0 ? Math.round((completedResponses / responders.length) * 100) : 0
+  const completedResponses = responders.filter(
+    (r) => r.status === "completed",
+  ).length;
+  const inProgressResponses = responders.filter(
+    (r) => r.status === "in-progress",
+  ).length;
+  const sentResponses = responders.filter((r) => r.status === "sent").length;
+  const responseRate =
+    responders.length > 0
+      ? Math.round((completedResponses / responders.length) * 100)
+      : 0;
   const openRate =
-    responders.length > 0 ? Math.round(((completedResponses + inProgressResponses) / responders.length) * 100) : 0
+    responders.length > 0
+      ? Math.round(
+          ((completedResponses + inProgressResponses) / responders.length) *
+            100,
+        )
+      : 0;
 
   const steps = [
     {
@@ -94,14 +113,16 @@ export default function OutreachCampaignPage() {
     {
       name: "Outreach Campaign",
       path: `/projects/${projectId}/outreach-campaign`,
-      completed: pathname.startsWith(`/projects/${projectId}/outreach-campaign`),
+      completed: pathname.startsWith(
+        `/projects/${projectId}/outreach-campaign`,
+      ),
     },
     {
       name: "Analytics & Reporting",
       path: `/projects/${projectId}/analytics`,
       completed: false,
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -119,7 +140,9 @@ export default function OutreachCampaignPage() {
               </div>
               Outreach Campaign
             </h1>
-            <p className="text-muted-foreground mt-2">Schedule, launch and monitor your survey outreach campaign.</p>
+            <p className="text-muted-foreground mt-2">
+              Schedule, launch and monitor your survey outreach campaign.
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -132,43 +155,48 @@ export default function OutreachCampaignPage() {
         <div className="relative">
           {/* Background connecting line */}
           <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 z-0" />
-          
+
           <div className="flex items-center justify-between gap-0 relative z-10">
-          {steps.map((step, index) => (
-            <div key={step.name} className="flex-1 flex flex-col items-center relative">
+            {steps.map((step, index) => (
               <div
-                className={cn(
+                key={step.name}
+                className="flex-1 flex flex-col items-center relative"
+              >
+                <div
+                  className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full text-base font-bold z-10 mb-2 border-2 transition-all duration-200",
-                  step.completed
+                    step.completed
                       ? "bg-green-500 text-white border-green-500 shadow-lg"
                       : "bg-white text-gray-500 border-gray-300",
-                )}
-              >
-                  {step.completed ? (
-                    <Check className="h-5 w-5" />
-                  ) : (
-                    index + 1
                   )}
-              </div>
-                
-                {/* Progress line to next step */}
-              {index < steps.length - 1 && (
-                <div className="absolute top-5 left-1/2 w-full h-0.5 z-0" style={{ right: '-50%', left: '50%' }}>
-                    <div 
-                      className={cn(
-                        "h-0.5 transition-all duration-300", 
-                        step.completed ? "bg-green-500" : "bg-gray-200"
-                      )} 
-                      style={{ width: '100%' }} 
-                    />
+                >
+                  {step.completed ? <Check className="h-5 w-5" /> : index + 1}
                 </div>
-              )}
-                
-              <div className="mt-2 text-xs font-medium text-center whitespace-nowrap" style={{ minWidth: 90 }}>
-                {step.name}
+
+                {/* Progress line to next step */}
+                {index < steps.length - 1 && (
+                  <div
+                    className="absolute top-5 left-1/2 w-full h-0.5 z-0"
+                    style={{ right: "-50%", left: "50%" }}
+                  >
+                    <div
+                      className={cn(
+                        "h-0.5 transition-all duration-300",
+                        step.completed ? "bg-green-500" : "bg-gray-200",
+                      )}
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                )}
+
+                <div
+                  className="mt-2 text-xs font-medium text-center whitespace-nowrap"
+                  style={{ minWidth: 90 }}
+                >
+                  {step.name}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>
@@ -193,11 +221,21 @@ export default function OutreachCampaignPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="start-date">Start Date</Label>
-                    <Input type="date" id="start-date" className="mt-1 bg-white/80" defaultValue="2023-11-10" />
+                    <Input
+                      type="date"
+                      id="start-date"
+                      className="mt-1 bg-white/80"
+                      defaultValue="2023-11-10"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="start-time">Start Time</Label>
-                    <Input type="time" id="start-time" className="mt-1 bg-white/80" defaultValue="09:00" />
+                    <Input
+                      type="time"
+                      id="start-time"
+                      className="mt-1 bg-white/80"
+                      defaultValue="09:00"
+                    />
                   </div>
                 </div>
 
@@ -214,7 +252,9 @@ export default function OutreachCampaignPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="staggered" id="staggered" />
-                      <Label htmlFor="staggered">Send in batches (recommended for large lists)</Label>
+                      <Label htmlFor="staggered">
+                        Send in batches (recommended for large lists)
+                      </Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -232,11 +272,17 @@ export default function OutreachCampaignPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-white/50 rounded-lg">
-                      <div className="text-sm text-gray-500">Total Contacts</div>
-                      <div className="text-2xl font-bold">{responders.length}</div>
+                      <div className="text-sm text-gray-500">
+                        Total Contacts
+                      </div>
+                      <div className="text-2xl font-bold">
+                        {responders.length}
+                      </div>
                     </div>
                     <div className="p-4 bg-white/50 rounded-lg">
-                      <div className="text-sm text-gray-500">Estimated Completion</div>
+                      <div className="text-sm text-gray-500">
+                        Estimated Completion
+                      </div>
                       <div className="text-2xl font-bold">2-3 days</div>
                     </div>
                   </div>
@@ -250,14 +296,18 @@ export default function OutreachCampaignPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Email Subject:</span>
-                        <span>We value your opinion - {currentProject.name}</span>
+                        <span>
+                          We value your opinion - {currentProject.name}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Questions:</span>
                         <span>10 questions in 4 sections</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Estimated Time to Complete:</span>
+                        <span className="text-gray-500">
+                          Estimated Time to Complete:
+                        </span>
                         <span>5-10 minutes</span>
                       </div>
                     </div>
@@ -283,7 +333,8 @@ export default function OutreachCampaignPage() {
                       <div>
                         <h3 className="font-medium">Campaign Active</h3>
                         <p className="text-sm text-green-600">
-                          Your campaign was launched on November 10, 2023 at 9:00 AM
+                          Your campaign was launched on November 10, 2023 at
+                          9:00 AM
                         </p>
                       </div>
                     </div>
@@ -291,12 +342,21 @@ export default function OutreachCampaignPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 bg-white/50 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500">Response Rate</div>
-                          <Badge className="bg-sylvia-600">{responseRate}%</Badge>
+                          <div className="text-sm text-gray-500">
+                            Response Rate
+                          </div>
+                          <Badge className="bg-sylvia-600">
+                            {responseRate}%
+                          </Badge>
                         </div>
-                        <Progress value={responseRate} className="mt-2 h-2" indicatorClassName="bg-sylvia-600" />
+                        <Progress
+                          value={responseRate}
+                          className="mt-2 h-2"
+                          indicatorClassName="bg-sylvia-600"
+                        />
                         <p className="text-xs text-gray-500 mt-1">
-                          {completedResponses} of {responders.length} respondents
+                          {completedResponses} of {responders.length}{" "}
+                          respondents
                         </p>
                       </div>
 
@@ -305,15 +365,22 @@ export default function OutreachCampaignPage() {
                           <div className="text-sm text-gray-500">Open Rate</div>
                           <Badge className="bg-sylvia-600">{openRate}%</Badge>
                         </div>
-                        <Progress value={openRate} className="mt-2 h-2" indicatorClassName="bg-sylvia-600" />
+                        <Progress
+                          value={openRate}
+                          className="mt-2 h-2"
+                          indicatorClassName="bg-sylvia-600"
+                        />
                         <p className="text-xs text-gray-500 mt-1">
-                          {completedResponses + inProgressResponses} of {responders.length} opened emails
+                          {completedResponses + inProgressResponses} of{" "}
+                          {responders.length} opened emails
                         </p>
                       </div>
 
                       <div className="p-4 bg-white/50 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500">Average Time to Complete</div>
+                          <div className="text-sm text-gray-500">
+                            Average Time to Complete
+                          </div>
                           <Badge className="bg-sylvia-600">7m 21s</Badge>
                         </div>
                         <div className="flex items-center gap-1 mt-2 text-sm text-gray-600">
@@ -328,16 +395,24 @@ export default function OutreachCampaignPage() {
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 flex items-center gap-3">
                       <Clock className="h-5 w-5" />
                       <div>
-                        <h3 className="font-medium">Campaign Ready to Launch</h3>
-                        <p className="text-sm text-blue-600">Complete your setup and launch when ready</p>
+                        <h3 className="font-medium">
+                          Campaign Ready to Launch
+                        </h3>
+                        <p className="text-sm text-blue-600">
+                          Complete your setup and launch when ready
+                        </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 bg-white/50 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500">Contacts Ready</div>
-                          <Badge className="bg-sylvia-600">{responders.length || 0}</Badge>
+                          <div className="text-sm text-gray-500">
+                            Contacts Ready
+                          </div>
+                          <Badge className="bg-sylvia-600">
+                            {responders.length || 0}
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-1 mt-2 text-sm text-gray-600">
                           <Users className="h-4 w-4 text-sylvia-600" />
@@ -347,7 +422,9 @@ export default function OutreachCampaignPage() {
 
                       <div className="p-4 bg-white/50 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500">Estimated Duration</div>
+                          <div className="text-sm text-gray-500">
+                            Estimated Duration
+                          </div>
                           <Badge className="bg-sylvia-600">2-3 days</Badge>
                         </div>
                         <div className="flex items-center gap-1 mt-2 text-sm text-gray-600">
@@ -358,8 +435,12 @@ export default function OutreachCampaignPage() {
 
                       <div className="p-4 bg-white/50 rounded-lg">
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500">Launch Status</div>
-                          <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Ready</Badge>
+                          <div className="text-sm text-gray-500">
+                            Launch Status
+                          </div>
+                          <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                            Ready
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-1 mt-2 text-sm text-gray-600">
                           <Zap className="h-4 w-4 text-sylvia-600" />
@@ -369,7 +450,10 @@ export default function OutreachCampaignPage() {
                     </div>
 
                     <div className="flex justify-center pt-4">
-                      <Button size="lg" className="bg-sylvia-600 hover:bg-sylvia-700">
+                      <Button
+                        size="lg"
+                        className="bg-sylvia-600 hover:bg-sylvia-700"
+                      >
                         <Zap className="mr-2 h-4 w-4" />
                         Launch Campaign Now
                       </Button>
@@ -389,7 +473,10 @@ export default function OutreachCampaignPage() {
                   <Users className="h-5 w-5 text-sylvia-600" />
                   {isCampaignLaunched ? "Respondents" : "Contact List"}
                 </div>
-                <Input placeholder="Search contacts..." className="max-w-xs bg-white/80" />
+                <Input
+                  placeholder="Search contacts..."
+                  className="max-w-xs bg-white/80"
+                />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -411,9 +498,12 @@ export default function OutreachCampaignPage() {
                           <TableCell colSpan={6}>
                             <div className="text-center py-8">
                               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                              <h3 className="text-lg font-medium text-gray-900 mb-2">Campaign Not Launched</h3>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                Campaign Not Launched
+                              </h3>
                               <p className="text-gray-500 mb-4">
-                                Launch your campaign to start tracking respondent progress and responses.
+                                Launch your campaign to start tracking
+                                respondent progress and responses.
                               </p>
                               <Button className="bg-sylvia-600 hover:bg-sylvia-700">
                                 <Zap className="mr-2 h-4 w-4" />
@@ -431,15 +521,19 @@ export default function OutreachCampaignPage() {
                                   <AvatarFallback>
                                     {responder.name
                                       ? responder.name
-                                      .split(" ")
-                                      .map((n: string) => n[0])
+                                          .split(" ")
+                                          .map((n: string) => n[0])
                                           .join("")
                                       : "U"}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium">{responder.name || "Unknown"}</div>
-                                  <div className="text-sm text-muted-foreground">{responder.email || "No email"}</div>
+                                  <div className="font-medium">
+                                    {responder.name || "Unknown"}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {responder.email || "No email"}
+                                  </div>
                                 </div>
                               </div>
                             </TableCell>
@@ -473,12 +567,16 @@ export default function OutreachCampaignPage() {
                                         : "bg-gray-300"
                                   }
                                 />
-                                <span className="text-xs">{responder.progress}%</span>
+                                <span className="text-xs">
+                                  {responder.progress}%
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell>
                               {responder.completedAt
-                                ? new Date(responder.completedAt).toLocaleDateString("en-US", {
+                                ? new Date(
+                                    responder.completedAt,
+                                  ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     hour: "2-digit",
@@ -493,7 +591,9 @@ export default function OutreachCampaignPage() {
                                 className="text-sylvia-600 hover:text-sylvia-700 hover:bg-sylvia-50"
                                 asChild
                               >
-                                <Link href={`/projects/${projectId}/outreach-campaign/${responder.id}`}>
+                                <Link
+                                  href={`/projects/${projectId}/outreach-campaign/${responder.id}`}
+                                >
                                   View Details
                                 </Link>
                               </Button>
@@ -507,9 +607,12 @@ export default function OutreachCampaignPage() {
               ) : (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Campaign Not Launched</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Campaign Not Launched
+                  </h3>
                   <p className="text-gray-500 mb-4">
-                    Launch your campaign to start tracking respondent progress and responses.
+                    Launch your campaign to start tracking respondent progress
+                    and responses.
                   </p>
                   <Button className="bg-sylvia-600 hover:bg-sylvia-700">
                     <Zap className="mr-2 h-4 w-4" />
@@ -528,20 +631,27 @@ export default function OutreachCampaignPage() {
                 <AlertCircle className="h-4 w-4 text-sylvia-600" />
                 <AlertTitle>Live Analytics</AlertTitle>
                 <AlertDescription>
-                  Track real-time statistics as your respondents complete the survey. For more comprehensive analytics,
-                  visit the Analytics & Reporting section after campaign completion.
+                  Track real-time statistics as your respondents complete the
+                  survey. For more comprehensive analytics, visit the Analytics
+                  & Reporting section after campaign completion.
                 </AlertDescription>
               </Alert>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <Card className="glass-card">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Response Rate
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{responseRate}%</div>
                     <div className="flex justify-between items-center mt-2">
-                      <Progress value={responseRate} className="h-2 flex-1 mr-4" indicatorClassName="bg-sylvia-600" />
+                      <Progress
+                        value={responseRate}
+                        className="h-2 flex-1 mr-4"
+                        indicatorClassName="bg-sylvia-600"
+                      />
                       <span className="text-xs text-muted-foreground">
                         {completedResponses} of {responders.length}
                       </span>
@@ -551,17 +661,23 @@ export default function OutreachCampaignPage() {
 
                 <Card className="glass-card">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Average Completion</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Average Completion
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">7.3 minutes</div>
-                    <p className="text-xs text-muted-foreground mt-2">Within expected range (5-10 min)</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Within expected range (5-10 min)
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="glass-card">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Net Promoter Score</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Net Promoter Score
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">+42</div>
@@ -590,39 +706,51 @@ export default function OutreachCampaignPage() {
                 <AlertCircle className="h-4 w-4 text-sylvia-600" />
                 <AlertTitle>Analytics Preview</AlertTitle>
                 <AlertDescription>
-                  Analytics will be available once your campaign is launched. Preview the metrics you'll be able to
-                  track.
+                  Analytics will be available once your campaign is launched.
+                  Preview the metrics you'll be able to track.
                 </AlertDescription>
               </Alert>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <Card className="glass-card opacity-60">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Response Rate
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-gray-400">—</div>
-                    <p className="text-xs text-muted-foreground mt-2">Available after launch</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Available after launch
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="glass-card opacity-60">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Average Completion</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Average Completion
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-gray-400">—</div>
-                    <p className="text-xs text-muted-foreground mt-2">Available after launch</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Available after launch
+                    </p>
                   </CardContent>
                 </Card>
 
                 <Card className="glass-card opacity-60">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Net Promoter Score</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Net Promoter Score
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-gray-400">—</div>
-                    <p className="text-xs text-muted-foreground mt-2">Available after launch</p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Available after launch
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -631,5 +759,5 @@ export default function OutreachCampaignPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

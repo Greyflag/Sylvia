@@ -1,10 +1,23 @@
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight, Download, Upload, Users, Zap } from "lucide-react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Upload,
+  Users,
+  Zap,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export default function ContactsPage() {
   return (
@@ -17,7 +30,9 @@ export default function ContactsPage() {
             </div>
             Contact List Management
           </h1>
-          <p className="text-muted-foreground mt-2">Upload and manage your contact lists for survey distribution.</p>
+          <p className="text-muted-foreground mt-2">
+            Upload and manage your contact lists for survey distribution.
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">Export Contacts</Button>
@@ -29,7 +44,6 @@ export default function ContactsPage() {
           </Button>
         </div>
       </div>
-
 
       <Card className="glass-card">
         <CardHeader>
@@ -43,10 +57,12 @@ export default function ContactsPage() {
             <div className="mx-auto bg-sylvia-100 text-sylvia-600 w-16 h-16 rounded-full flex items-center justify-center mb-4">
               <Upload className="h-8 w-8" />
             </div>
-            <h3 className="text-lg font-medium mb-2">Drag and drop your contact file</h3>
+            <h3 className="text-lg font-medium mb-2">
+              Drag and drop your contact file
+            </h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Upload a CSV or Excel file containing your contacts. You can also click the button below to browse your
-              files.
+              Upload a CSV or Excel file containing your contacts. You can also
+              click the button below to browse your files.
             </p>
             <Button className="bg-sylvia-600 hover:bg-sylvia-700">
               <Upload className="mr-2 h-4 w-4" />
@@ -76,7 +92,10 @@ export default function ContactsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[40px]">
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
@@ -88,70 +107,100 @@ export default function ContactsPage() {
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableCell>
                   <TableCell className="font-medium">John Smith</TableCell>
                   <TableCell>john.smith@example.com</TableCell>
                   <TableCell>Acme Inc.</TableCell>
                   <TableCell>CTO</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
                       Valid
                     </Badge>
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableCell>
                   <TableCell className="font-medium">Sarah Johnson</TableCell>
                   <TableCell>sarah.j@company.co</TableCell>
                   <TableCell>XYZ Corp</TableCell>
                   <TableCell>Director</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
                       Valid
                     </Badge>
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableCell>
                   <TableCell className="font-medium">Michael Brown</TableCell>
                   <TableCell>m.brown@tech.io</TableCell>
                   <TableCell>Tech Solutions</TableCell>
                   <TableCell>Manager</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-yellow-50 text-yellow-700 border-yellow-200"
+                    >
                       Pending
                     </Badge>
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableCell>
                   <TableCell className="font-medium">Emily Davis</TableCell>
                   <TableCell>emily@invalid</TableCell>
                   <TableCell>Global Services</TableCell>
                   <TableCell>VP</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-red-50 text-red-700 border-red-200"
+                    >
                       Invalid Email
                     </Badge>
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <input type="checkbox" className="rounded border-gray-300" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                    />
                   </TableCell>
                   <TableCell className="font-medium">Robert Wilson</TableCell>
                   <TableCell>rwilson@enterprise.com</TableCell>
                   <TableCell>Enterprise Inc.</TableCell>
                   <TableCell>CEO</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
                       Valid
                     </Badge>
                   </TableCell>
@@ -161,7 +210,9 @@ export default function ContactsPage() {
           </div>
 
           <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-muted-foreground">Showing 5 of 5 contacts</div>
+            <div className="text-sm text-muted-foreground">
+              Showing 5 of 5 contacts
+            </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
                 <Download className="mr-2 h-4 w-4" />
@@ -190,5 +241,5 @@ export default function ContactsPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

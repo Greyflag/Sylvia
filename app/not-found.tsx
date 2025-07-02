@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { FileSearch } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { FileSearch } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -16,5 +16,5 @@ export default function NotFound() {
         <Link href="/">Return to Dashboard</Link>
       </Button>
     </div>
-  )
+  );
 }

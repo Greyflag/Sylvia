@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Users } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 
 export default function ContactsNotFound() {
   return (
@@ -10,11 +10,12 @@ export default function ContactsNotFound() {
       </div>
       <h1 className="text-3xl font-bold mb-2">Contacts Not Found</h1>
       <p className="text-muted-foreground mb-6 max-w-md">
-        The contact list you're looking for doesn't exist or you don't have access to it.
+        The contact list you're looking for doesn't exist or you don't have
+        access to it.
       </p>
       <Button asChild>
         <Link href="/">Return to Dashboard</Link>
       </Button>
     </div>
-  )
+  );
 }

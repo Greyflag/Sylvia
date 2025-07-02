@@ -50,7 +50,7 @@ const enterpriseContacts = [
     status: "valid",
     tags: ["operations", "scale", "head"],
   },
-]
+];
 
 const enterpriseQuestions = [
   {
@@ -60,7 +60,12 @@ const enterpriseQuestions = [
     section: "Demographics",
     subSection: "Company Information",
     required: true,
-    options: ["1-10 employees", "11-50 employees", "51-200 employees", "200+ employees"],
+    options: [
+      "1-10 employees",
+      "11-50 employees",
+      "51-200 employees",
+      "200+ employees",
+    ],
     objective: "Understand customer demographics",
     kpi: "Company Size Distribution",
   },
@@ -71,7 +76,12 @@ const enterpriseQuestions = [
     section: "Usage",
     subSection: "Product Usage",
     required: true,
-    options: ["Less than 6 months", "6-12 months", "1-2 years", "More than 2 years"],
+    options: [
+      "Less than 6 months",
+      "6-12 months",
+      "1-2 years",
+      "More than 2 years",
+    ],
     objective: "Understand usage patterns",
     kpi: "Customer Tenure",
   },
@@ -107,7 +117,7 @@ const enterpriseQuestions = [
     objective: "Identify future product needs",
     kpi: "Feature Request Volume",
   },
-]
+];
 
 const enterpriseResponses = [
   {
@@ -185,24 +195,24 @@ const enterpriseResponses = [
       Q5: "Bulk operations and team collaboration features",
     },
   },
-]
+];
 
 // Empty data for draft projects
-const emptyContacts: any[] = []
-const emptyQuestions: any[] = []
-const emptyResponses: any[] = []
+const emptyContacts: any[] = [];
+const emptyQuestions: any[] = [];
+const emptyResponses: any[] = [];
 
 // Store for draft project questions
-let draftQuestions: any[] = []
+let draftQuestions: any[] = [];
 
 // Store for draft project contacts
-let draftContacts: any[] = []
+let draftContacts: any[] = [];
 
 export function getProjectContacts(projectId: string) {
   if (projectId === "enterprise-satisfaction") {
-    return enterpriseContacts
+    return enterpriseContacts;
   }
-  return draftContacts
+  return draftContacts;
 }
 
 export function getProjectQuestionSet(projectId: string) {
@@ -211,9 +221,9 @@ export function getProjectQuestionSet(projectId: string) {
 
 export function getProjectResponses(projectId: string) {
   if (projectId === "enterprise-satisfaction") {
-    return enterpriseResponses
+    return enterpriseResponses;
   }
-  return emptyResponses
+  return emptyResponses;
 }
 
 export function getProjectObjectives(projectId: string) {
@@ -222,7 +232,8 @@ export function getProjectObjectives(projectId: string) {
       {
         id: "1",
         title: "Understand Customer Satisfaction",
-        description: "Measure overall satisfaction levels with our product and services",
+        description:
+          "Measure overall satisfaction levels with our product and services",
         status: "completed",
         priority: "high",
         dueDate: "2023-11-01",
@@ -230,7 +241,8 @@ export function getProjectObjectives(projectId: string) {
       {
         id: "2",
         title: "Identify Feature Gaps",
-        description: "Discover what features customers need that we don't currently offer",
+        description:
+          "Discover what features customers need that we don't currently offer",
         status: "completed",
         priority: "medium",
         dueDate: "2023-11-05",
@@ -243,9 +255,9 @@ export function getProjectObjectives(projectId: string) {
         priority: "high",
         dueDate: "2023-11-10",
       },
-    ]
+    ];
   }
-  return []
+  return [];
 }
 
 export function getProjectAnalytics(projectId: string) {
@@ -263,7 +275,7 @@ export function getProjectAnalytics(projectId: string) {
         "Better onboarding",
         "Team collaboration",
       ],
-    }
+    };
   }
   return {
     totalResponses: 0,
@@ -272,69 +284,77 @@ export function getProjectAnalytics(projectId: string) {
     npsScore: 0,
     completionRate: 0,
     topFeatureRequests: [],
-  }
+  };
 }
 
 export function getResponseById(projectId: string, responseId: string) {
-  const responses = getProjectResponses(projectId)
-  return responses.find((response) => response.id === responseId)
+  const responses = getProjectResponses(projectId);
+  return responses.find((response) => response.id === responseId);
 }
 
 export function createQuestion(projectId: string, question: any) {
   if (projectId === "enterprise-satisfaction") {
-    return // Don't modify the completed project
+    return; // Don't modify the completed project
   }
-  draftQuestions.push(question)
-  return question
+  draftQuestions.push(question);
+  return question;
 }
 
 export function updateProject(projectId: string, project: any) {
   if (projectId === "enterprise-satisfaction") {
-    return // Don't modify the completed project
+    return; // Don't modify the completed project
   }
   // In a real app, this would update the project in the database
-  return project
+  return project;
 }
 
 export function createContact(projectId: string, contact: any) {
   if (projectId === "enterprise-satisfaction") {
-    return // Don't modify the completed project
+    return; // Don't modify the completed project
   }
   const newContact = {
     ...contact,
     id: `contact-${Date.now()}`,
     status: "valid",
-    tags: contact.tags ? contact.tags.split(",").map((tag: string) => tag.trim()) : []
-  }
-  draftContacts.push(newContact)
-  return newContact
+    tags: contact.tags
+      ? contact.tags.split(",").map((tag: string) => tag.trim())
+      : [],
+  };
+  draftContacts.push(newContact);
+  return newContact;
 }
 
-export function updateContact(projectId: string, contactId: string, updates: any) {
+export function updateContact(
+  projectId: string,
+  contactId: string,
+  updates: any,
+) {
   if (projectId === "enterprise-satisfaction") {
-    return // Don't modify the completed project
+    return; // Don't modify the completed project
   }
-  const index = draftContacts.findIndex(contact => contact.id === contactId)
+  const index = draftContacts.findIndex((contact) => contact.id === contactId);
   if (index !== -1) {
     const updatedContact = {
       ...draftContacts[index],
       ...updates,
-      tags: updates.tags ? updates.tags.split(",").map((tag: string) => tag.trim()) : draftContacts[index].tags
-    }
-    draftContacts[index] = updatedContact
-    return updatedContact
+      tags: updates.tags
+        ? updates.tags.split(",").map((tag: string) => tag.trim())
+        : draftContacts[index].tags,
+    };
+    draftContacts[index] = updatedContact;
+    return updatedContact;
   }
-  return null
+  return null;
 }
 
 export function deleteContact(projectId: string, contactId: string) {
   if (projectId === "enterprise-satisfaction") {
-    return // Don't modify the completed project
+    return; // Don't modify the completed project
   }
-  const index = draftContacts.findIndex(contact => contact.id === contactId)
+  const index = draftContacts.findIndex((contact) => contact.id === contactId);
   if (index !== -1) {
-    draftContacts.splice(index, 1)
-    return true
+    draftContacts.splice(index, 1);
+    return true;
   }
-  return false
+  return false;
 }
