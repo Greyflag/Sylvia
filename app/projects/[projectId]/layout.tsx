@@ -1,26 +1,27 @@
-"use client"
+"use client";
 
-import { useParams } from "next/navigation"
-import { Sidebar } from "@/components/layout/sidebar"
-import { useProject } from "@/components/project-context"
-import { useEffect, useState } from "react"
+import { useParams } from "next/navigation";
+import { Sidebar } from "@/components/layout/sidebar";
+import { useProject } from "@/components/project-context";
+import { useEffect, useState } from "react";
 
 export default function ProjectLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { projectId } = useParams()
-  const { allProjects, currentProject, setCurrentProject, isHydrated } = useProject()
+  const { projectId } = useParams();
+  const { allProjects, currentProject, setCurrentProject, isHydrated } =
+    useProject();
 
   useEffect(() => {
     if (isHydrated) {
-      const project = allProjects.find((p) => p.id === projectId)
+      const project = allProjects.find((p) => p.id === projectId);
       if (project) {
-        setCurrentProject(project)
+        setCurrentProject(project);
       }
     }
-  }, [projectId, allProjects, setCurrentProject, isHydrated])
+  }, [projectId, allProjects, setCurrentProject, isHydrated]);
 
   // Wait for hydration to complete
   if (!isHydrated) {
@@ -31,17 +32,17 @@ export default function ProjectLayout({
           <p className="text-muted-foreground">Loading project...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="flex h-screen">
-      <Sidebar 
+      <Sidebar
         key={`${currentProject?.id}-${currentProject?.progress}-${currentProject?.status}`}
-        projectId={projectId} 
-        project={currentProject || allProjects.find((p) => p.id === projectId)} 
+        projectId={projectId}
+        project={currentProject || allProjects.find((p) => p.id === projectId)}
       />
       <main className="flex-1 p-8">{children}</main>
     </div>
-  )
+  );
 }

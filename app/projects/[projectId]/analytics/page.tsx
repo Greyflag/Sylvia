@@ -1,12 +1,19 @@
-"use client"
+"use client";
 
-import { useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { getProjectAnalytics, getProjectResponses } from "@/lib/data-service"
-import { useProject } from "@/components/project-context"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { getProjectAnalytics, getProjectResponses } from "@/lib/data-service";
+import { useProject } from "@/components/project-context";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart3,
   Download,
@@ -32,9 +39,9 @@ import {
   Search,
   Loader2,
   CheckCircle,
-} from "lucide-react"
-import { useState, useEffect, useRef } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Line,
   LineChart,
@@ -49,33 +56,48 @@ import {
   Cell,
   PieChart,
   Pie,
-} from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Link from "next/link"
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Link from "next/link";
 
 export default function AnalyticsPage() {
-  const params = useParams()
-  const projectId = params.projectId as string
-  const { currentProject, setCurrentProject, allProjects, updateProject } = useProject()
-  const [openInsight, setOpenInsight] = useState<string | null>("satisfaction")
-  const [selectedObjective, setSelectedObjective] = useState<string>("all")
-  const [showFakeAnalysis, setShowFakeAnalysis] = useState(false)
-  const [isAILoading, setIsAILoading] = useState(false)
-  const [aiLoadingStep, setAILoadingStep] = useState(0)
-  const [fakeAnalytics, setFakeAnalytics] = useState<any>(null)
-  const [projectJustCompleted, setProjectJustCompleted] = useState(false)
-  const analyticsRef = useRef<any>(null)
+  const params = useParams();
+  const projectId = params.projectId as string;
+  const { currentProject, setCurrentProject, allProjects, updateProject } =
+    useProject();
+  const [openInsight, setOpenInsight] = useState<string | null>("satisfaction");
+  const [selectedObjective, setSelectedObjective] = useState<string>("all");
+  const [showFakeAnalysis, setShowFakeAnalysis] = useState(false);
+  const [isAILoading, setIsAILoading] = useState(false);
+  const [aiLoadingStep, setAILoadingStep] = useState(0);
+  const [fakeAnalytics, setFakeAnalytics] = useState<any>(null);
+  const [projectJustCompleted, setProjectJustCompleted] = useState(false);
+  const analyticsRef = useRef<any>(null);
 
   // Get analytics data for this project
-  const analytics = fakeAnalytics || getProjectAnalytics(projectId)
-  const responses = getProjectResponses(projectId)
+  const analytics = fakeAnalytics || getProjectAnalytics(projectId);
+  const responses = getProjectResponses(projectId);
 
   // Check if this is the completed project
-  const isCompleted = currentProject?.status === "completed"
+  const isCompleted = currentProject?.status === "completed";
 
   // Enhanced trend data
   const satisfactionTrendData = [
@@ -91,7 +113,7 @@ export default function AnalyticsPage() {
     { month: "Oct", satisfaction: 4.1 },
     { month: "Nov", satisfaction: 4.4 },
     { month: "Dec", satisfaction: 4.3 },
-  ]
+  ];
 
   const npsTrendData = [
     { month: "Jan", nps: 60 },
@@ -106,7 +128,7 @@ export default function AnalyticsPage() {
     { month: "Oct", nps: 73 },
     { month: "Nov", nps: 75 },
     { month: "Dec", nps: 77 },
-  ]
+  ];
 
   const featureUsageData = [
     { name: "API Integration", usage: 85 },
@@ -114,20 +136,20 @@ export default function AnalyticsPage() {
     { name: "Reporting", usage: 78 },
     { name: "User Management", usage: 62 },
     { name: "Analytics", usage: 74 },
-  ]
+  ];
 
   const satisfactionByRoleData = [
     { name: "C-Suite", satisfaction: 4.5 },
     { name: "Management", satisfaction: 4.2 },
     { name: "Technical", satisfaction: 3.8 },
     { name: "End Users", satisfaction: 3.9 },
-  ]
+  ];
 
   const npsBreakdownData = [
     { name: "Promoters", value: 65, color: "#22c55e" },
     { name: "Passives", value: 25, color: "#f59e0b" },
     { name: "Detractors", value: 10, color: "#ef4444" },
-  ]
+  ];
 
   const sentimentByFeatureData = [
     { name: "API", positive: 75, negative: 25 },
@@ -135,7 +157,7 @@ export default function AnalyticsPage() {
     { name: "Support", positive: 90, negative: 10 },
     { name: "Pricing", positive: 60, negative: 40 },
     { name: "Docs", positive: 65, negative: 35 },
-  ]
+  ];
 
   // Churn analysis data
   const churnData = [
@@ -144,7 +166,7 @@ export default function AnalyticsPage() {
     { month: "Sep", churnRate: 9.1, newChurns: 15 },
     { month: "Oct", churnRate: 6.5, newChurns: 9 },
     { month: "Nov", churnRate: 5.2, newChurns: 7 },
-  ]
+  ];
 
   const churnReasonData = [
     { reason: "Pricing Concerns", count: 18, percentage: 35 },
@@ -153,13 +175,13 @@ export default function AnalyticsPage() {
     { reason: "Competitor Switch", count: 7, percentage: 14 },
     { reason: "Technical Issues", count: 4, percentage: 8 },
     { reason: "Other", count: 3, percentage: 6 },
-  ]
+  ];
 
   const churnBySegmentData = [
     { segment: "Small Business", churnRate: 12.5, avgTenure: 8 },
     { segment: "Mid-Market", churnRate: 6.8, avgTenure: 14 },
     { segment: "Enterprise", churnRate: 3.2, avgTenure: 24 },
-  ]
+  ];
 
   const churnedCustomerQuotes = [
     {
@@ -192,7 +214,7 @@ export default function AnalyticsPage() {
       tenure: "12 months",
       churnDate: "2024-11-03",
     },
-  ]
+  ];
 
   // Customer quotes
   const customerQuotes = [
@@ -232,7 +254,7 @@ export default function AnalyticsPage() {
       sentiment: "positive",
       topic: "Mobile",
     },
-  ]
+  ];
 
   // Sylvia insights
   const sylviaInsights = [
@@ -240,7 +262,8 @@ export default function AnalyticsPage() {
       id: "satisfaction",
       title: "Satisfaction Drivers",
       icon: <Star className="h-5 w-5 text-amber-500" />,
-      summary: "Technical users report lower satisfaction scores than management and executives.",
+      summary:
+        "Technical users report lower satisfaction scores than management and executives.",
       details:
         "There's a 0.7 point gap between C-Suite satisfaction (4.5/5) and Technical users (3.8/5). This suggests the product may be meeting executive needs but causing friction for technical implementers. The primary pain points mentioned by technical users relate to API documentation and integration complexity.",
       recommendations: [
@@ -255,7 +278,8 @@ export default function AnalyticsPage() {
       id: "detractors",
       title: "Detractor Analysis",
       icon: <ThumbsDown className="h-5 w-5 text-red-500" />,
-      summary: "10% of respondents are detractors, primarily citing documentation and pricing concerns.",
+      summary:
+        "10% of respondents are detractors, primarily citing documentation and pricing concerns.",
       details:
         "Analysis of detractor responses reveals two main themes: documentation quality (mentioned by 65% of detractors) and pricing structure (mentioned by 40% of detractors). Specifically, detractors find the pricing tiers confusing and feel the documentation lacks depth for advanced use cases.",
       recommendations: [
@@ -270,7 +294,8 @@ export default function AnalyticsPage() {
       id: "feature",
       title: "Feature Opportunity",
       icon: <Lightbulb className="h-5 w-5 text-yellow-500" />,
-      summary: "Team collaboration features are the most requested enhancement across all segments.",
+      summary:
+        "Team collaboration features are the most requested enhancement across all segments.",
       details:
         "35% of all respondents mentioned team collaboration features in their open-ended feedback. This was consistent across company sizes and roles, indicating a universal need. Current workarounds mentioned include using third-party tools alongside your product, creating friction in the workflow.",
       recommendations: [
@@ -285,7 +310,8 @@ export default function AnalyticsPage() {
       id: "competitive",
       title: "Competitive Position",
       icon: <Target className="h-5 w-5 text-blue-500" />,
-      summary: "Your NPS of 78 is significantly above the industry average of 32 for B2B SaaS.",
+      summary:
+        "Your NPS of 78 is significantly above the industry average of 32 for B2B SaaS.",
       details:
         "Your Net Promoter Score of 78 places you in the top 5% of B2B SaaS companies. This is a strong competitive advantage, particularly in enterprise sales cycles where reference customers are crucial. The high proportion of promoters (65%) provides an opportunity for case studies and testimonials.",
       recommendations: [
@@ -300,7 +326,8 @@ export default function AnalyticsPage() {
       id: "churn",
       title: "Churn Risk Analysis",
       icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
-      summary: "Pricing concerns and feature limitations are driving 58% of customer churn.",
+      summary:
+        "Pricing concerns and feature limitations are driving 58% of customer churn.",
       details:
         "Analysis of churned customers reveals that 35% cited pricing concerns and 23% mentioned feature limitations as primary reasons for leaving. Small businesses show the highest churn rate at 12.5%, with an average tenure of only 8 months. The pattern suggests that customers churn when their needs outgrow the current feature set or when budget constraints become critical.",
       recommendations: [
@@ -312,7 +339,7 @@ export default function AnalyticsPage() {
       severity: "high",
       objectives: ["obj2", "obj1"], // Associated with churn reduction and satisfaction
     },
-  ]
+  ];
 
   const objectives = [
     { id: "all", name: "All Objectives" },
@@ -320,21 +347,23 @@ export default function AnalyticsPage() {
     { id: "obj2", name: "Reduce Churn Rate" },
     { id: "obj3", name: "Enhance Product Features" },
     { id: "obj4", name: "Optimize User Experience" },
-  ]
+  ];
 
   const filteredInsights =
     selectedObjective === "all"
       ? sylviaInsights
-      : sylviaInsights.filter((insight) => insight.objectives.includes(selectedObjective))
+      : sylviaInsights.filter((insight) =>
+          insight.objectives.includes(selectedObjective),
+        );
 
   // Handler for test AI analysis
   const handleTestAIAnalysis = () => {
-    setIsAILoading(true)
-    setShowFakeAnalysis(false)
-    setAILoadingStep(0)
+    setIsAILoading(true);
+    setShowFakeAnalysis(false);
+    setAILoadingStep(0);
     // Save original analytics for restoration
     if (!analyticsRef.current) {
-      analyticsRef.current = getProjectAnalytics(projectId)
+      analyticsRef.current = getProjectAnalytics(projectId);
     }
     const steps = [
       "Connecting to Sylvia AI...",
@@ -342,25 +371,25 @@ export default function AnalyticsPage() {
       "Detecting advanced patterns and correlations...",
       "Performing sentiment and topic analysis...",
       "Synthesizing actionable recommendations...",
-      "Finalizing your AI-powered analytics report..."
-    ]
-    let step = 0
+      "Finalizing your AI-powered analytics report...",
+    ];
+    let step = 0;
     const interval = setInterval(() => {
       setAILoadingStep((prev) => {
         if (prev < steps.length - 1) {
-          return prev + 1
+          return prev + 1;
         }
-        return prev
-      })
-      step++
+        return prev;
+      });
+      step++;
       if (step >= steps.length) {
-        clearInterval(interval)
+        clearInterval(interval);
       }
-    }, 1300)
+    }, 1300);
     setTimeout(() => {
-      setIsAILoading(false)
-      setShowFakeAnalysis(true)
-      setAILoadingStep(0)
+      setIsAILoading(false);
+      setShowFakeAnalysis(true);
+      setAILoadingStep(0);
       // Set fake analytics data
       setFakeAnalytics({
         ...analyticsRef.current,
@@ -369,61 +398,73 @@ export default function AnalyticsPage() {
         npsScore: 67,
         completionRate: 91,
         responseRate: 80,
-      })
-      
+      });
+
       // Update project progress to 100% and mark as completed
       if (currentProject) {
         updateProject(projectId, {
           progress: 100,
           status: "completed",
           updatedAt: new Date().toISOString(),
-        })
-        
+        });
+
         // Set flag to show completion banner
-        setProjectJustCompleted(true)
-        
+        setProjectJustCompleted(true);
+
         // Show success notification
-        console.log("🎉 Project completed! All navigation steps are now green.")
+        console.log(
+          "🎉 Project completed! All navigation steps are now green.",
+        );
       }
-    }, 7800)
-  }
+    }, 7800);
+  };
 
   // Restore analytics on unmount or when fake analysis is dismissed
   useEffect(() => {
     return () => {
-      setFakeAnalytics(null)
-      analyticsRef.current = null
-      setProjectJustCompleted(false)
-    }
-  }, [])
+      setFakeAnalytics(null);
+      analyticsRef.current = null;
+      setProjectJustCompleted(false);
+    };
+  }, []);
 
   // Reset projectJustCompleted when currentProject changes
   useEffect(() => {
-    setProjectJustCompleted(false)
-  }, [currentProject?.id])
+    setProjectJustCompleted(false);
+  }, [currentProject?.id]);
 
   // Optionally, add a button to dismiss fake analysis and restore original analytics
   const handleDismissFakeAnalysis = () => {
-    setShowFakeAnalysis(false)
-    setFakeAnalytics(null)
-    setProjectJustCompleted(false)
-  }
+    setShowFakeAnalysis(false);
+    setFakeAnalytics(null);
+    setProjectJustCompleted(false);
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Analytics & Reporting</h1>
-          <p className="text-muted-foreground mt-1">View and analyze your survey results</p>
+          <p className="text-muted-foreground mt-1">
+            View and analyze your survey results
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2">
-            <Button variant="outline" className="border-sylvia-300 text-sylvia-700" onClick={handleTestAIAnalysis}>
+            <Button
+              variant="outline"
+              className="border-sylvia-300 text-sylvia-700"
+              onClick={handleTestAIAnalysis}
+            >
               <Brain className="mr-2 h-4 w-4 animate-pulse" />
               Test AI Analysis
             </Button>
             {showFakeAnalysis && (
-              <Button variant="ghost" className="text-sylvia-600 underline" onClick={handleDismissFakeAnalysis}>
+              <Button
+                variant="ghost"
+                className="text-sylvia-600 underline"
+                onClick={handleDismissFakeAnalysis}
+              >
                 Dismiss Test Analysis
               </Button>
             )}
@@ -448,19 +489,26 @@ export default function AnalyticsPage() {
               <Loader2 className="h-10 w-10 animate-spin" />
             </div>
             <div className="text-xl font-semibold text-sylvia-700 text-center min-h-[48px]">
-              {[
-                "Connecting to Sylvia AI...",
-                "Aggregating and normalizing survey data...",
-                "Detecting advanced patterns and correlations...",
-                "Performing sentiment and topic analysis...",
-                "Synthesizing actionable recommendations...",
-                "Finalizing your AI-powered analytics report..."
-              ][aiLoadingStep]}
+              {
+                [
+                  "Connecting to Sylvia AI...",
+                  "Aggregating and normalizing survey data...",
+                  "Detecting advanced patterns and correlations...",
+                  "Performing sentiment and topic analysis...",
+                  "Synthesizing actionable recommendations...",
+                  "Finalizing your AI-powered analytics report...",
+                ][aiLoadingStep]
+              }
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
-              <div className="bg-sylvia-600 h-3 rounded-full transition-all duration-500" style={{ width: `${(aiLoadingStep + 1) * 16.66}%` }} />
+              <div
+                className="bg-sylvia-600 h-3 rounded-full transition-all duration-500"
+                style={{ width: `${(aiLoadingStep + 1) * 16.66}%` }}
+              />
             </div>
-            <div className="text-xs text-gray-400 mt-2">Sylvia AI is analyzing your data and generating insights...</div>
+            <div className="text-xs text-gray-400 mt-2">
+              Sylvia AI is analyzing your data and generating insights...
+            </div>
           </div>
         </div>
       )}
@@ -472,40 +520,91 @@ export default function AnalyticsPage() {
             <Card className="border-2 border-green-300 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 animate-fade-in">
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
                 <CheckCircle className="h-7 w-7 text-green-600" />
-                <CardTitle className="text-2xl text-green-900">Project Completed! 🎉</CardTitle>
+                <CardTitle className="text-2xl text-green-900">
+                  Project Completed! 🎉
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-2">
                 <p className="text-green-800">
-                  Congratulations! Your project has been marked as completed. All navigation steps in the sidebar are now green, 
-                  indicating that you've successfully completed the entire survey workflow.
+                  Congratulations! Your project has been marked as completed.
+                  All navigation steps in the sidebar are now green, indicating
+                  that you've successfully completed the entire survey workflow.
                 </p>
               </CardContent>
             </Card>
           )}
-          
+
           <Card className="border-2 border-sylvia-300 shadow-lg bg-gradient-to-br from-purple-50 to-sylvia-50 animate-fade-in">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
               <Brain className="h-7 w-7 text-sylvia-600 animate-pulse" />
-              <CardTitle className="text-2xl text-sylvia-900">Sylvia AI Deep Analysis</CardTitle>
+              <CardTitle className="text-2xl text-sylvia-900">
+                Sylvia AI Deep Analysis
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-2">
-              <div className="text-lg font-semibold text-sylvia-700">Key Findings</div>
+              <div className="text-lg font-semibold text-sylvia-700">
+                Key Findings
+              </div>
               <ul className="list-disc pl-6 space-y-2 text-sylvia-800">
-                <li><b>Hidden Churn Risk:</b> Advanced pattern detection identified a 17% churn risk among mid-market customers, primarily driven by delayed feature adoption and low engagement in the first 60 days.</li>
-                <li><b>Sentiment Hotspots:</b> Sentiment analysis revealed that "support" and "integration" are the most polarizing topics, with 68% positive and 32% negative sentiment split. Negative comments cluster around onboarding complexity and response times.</li>
-                <li><b>Feature Impact:</b> Customers who used the new dashboard feature at least 3 times per week reported a 1.2-point higher satisfaction score and were 2.5x more likely to recommend the product.</li>
-                <li><b>Predictive NPS:</b> AI regression modeling predicts a 9-point NPS increase if documentation and onboarding are improved, with the largest impact among technical users.</li>
-                <li><b>Engagement Drop-off:</b> 24% of users show a sharp engagement drop after the first month, correlating with a lack of personalized follow-up and unclear value communication.</li>
+                <li>
+                  <b>Hidden Churn Risk:</b> Advanced pattern detection
+                  identified a 17% churn risk among mid-market customers,
+                  primarily driven by delayed feature adoption and low
+                  engagement in the first 60 days.
+                </li>
+                <li>
+                  <b>Sentiment Hotspots:</b> Sentiment analysis revealed that
+                  "support" and "integration" are the most polarizing topics,
+                  with 68% positive and 32% negative sentiment split. Negative
+                  comments cluster around onboarding complexity and response
+                  times.
+                </li>
+                <li>
+                  <b>Feature Impact:</b> Customers who used the new dashboard
+                  feature at least 3 times per week reported a 1.2-point higher
+                  satisfaction score and were 2.5x more likely to recommend the
+                  product.
+                </li>
+                <li>
+                  <b>Predictive NPS:</b> AI regression modeling predicts a
+                  9-point NPS increase if documentation and onboarding are
+                  improved, with the largest impact among technical users.
+                </li>
+                <li>
+                  <b>Engagement Drop-off:</b> 24% of users show a sharp
+                  engagement drop after the first month, correlating with a lack
+                  of personalized follow-up and unclear value communication.
+                </li>
               </ul>
-              <div className="text-lg font-semibold text-sylvia-700 mt-6">AI Recommendations</div>
+              <div className="text-lg font-semibold text-sylvia-700 mt-6">
+                AI Recommendations
+              </div>
               <ol className="list-decimal pl-6 space-y-2 text-sylvia-800">
-                <li>Launch a targeted onboarding campaign for new users, focusing on integration and support resources.</li>
-                <li>Develop a "quick wins" dashboard tour to drive early feature adoption and reduce first-month churn.</li>
-                <li>Expand documentation with technical deep-dives and real-world use cases, prioritizing feedback from detractors.</li>
-                <li>Implement proactive support check-ins for accounts with low engagement in the first 30 days.</li>
-                <li>Leverage promoters for testimonials and peer-led webinars to amplify positive sentiment and NPS.</li>
+                <li>
+                  Launch a targeted onboarding campaign for new users, focusing
+                  on integration and support resources.
+                </li>
+                <li>
+                  Develop a "quick wins" dashboard tour to drive early feature
+                  adoption and reduce first-month churn.
+                </li>
+                <li>
+                  Expand documentation with technical deep-dives and real-world
+                  use cases, prioritizing feedback from detractors.
+                </li>
+                <li>
+                  Implement proactive support check-ins for accounts with low
+                  engagement in the first 30 days.
+                </li>
+                <li>
+                  Leverage promoters for testimonials and peer-led webinars to
+                  amplify positive sentiment and NPS.
+                </li>
               </ol>
-              <div className="text-xs text-gray-500 mt-4">This analysis is for demonstration purposes and does not affect your real analytics data.</div>
+              <div className="text-xs text-gray-500 mt-4">
+                This analysis is for demonstration purposes and does not affect
+                your real analytics data.
+              </div>
             </CardContent>
           </Card>
         </>
@@ -520,13 +619,18 @@ export default function AnalyticsPage() {
               <h2 className="text-lg font-medium">No Data Available</h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              Analytics will be available once you've collected survey responses. Complete your survey setup and launch
-              your campaign to start seeing insights here.
+              Analytics will be available once you've collected survey
+              responses. Complete your survey setup and launch your campaign to
+              start seeing insights here.
             </p>
             <div className="flex items-center gap-4">
               <div>
-                <span className="text-sm text-muted-foreground">Current Responses:</span>
-                <span className="ml-1 font-medium">{analytics.totalResponses}</span>
+                <span className="text-sm text-muted-foreground">
+                  Current Responses:
+                </span>
+                <span className="ml-1 font-medium">
+                  {analytics.totalResponses}
+                </span>
               </div>
               <div>
                 <span className="text-sm text-muted-foreground">Target:</span>
@@ -545,9 +649,14 @@ export default function AnalyticsPage() {
                   <div className="bg-gradient-to-r from-sylvia-600 to-purple-600 rounded-full p-1.5">
                     <Sparkles className="h-5 w-5 text-white" />
                   </div>
-                  <CardTitle className="text-lg text-sylvia-900">Sylvia Insights</CardTitle>
+                  <CardTitle className="text-lg text-sylvia-900">
+                    Sylvia Insights
+                  </CardTitle>
                 </div>
-                <Select value={selectedObjective} onValueChange={setSelectedObjective}>
+                <Select
+                  value={selectedObjective}
+                  onValueChange={setSelectedObjective}
+                >
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Filter by objective" />
                   </SelectTrigger>
@@ -561,10 +670,15 @@ export default function AnalyticsPage() {
                 </Select>
               </div>
               <CardDescription>
-                AI-powered analysis of your survey data with personalized recommendations
+                AI-powered analysis of your survey data with personalized
+                recommendations
                 {selectedObjective !== "all" && (
                   <span className="ml-2 text-sylvia-600">
-                    • Filtered by {objectives.find((obj) => obj.id === selectedObjective)?.name}
+                    • Filtered by{" "}
+                    {
+                      objectives.find((obj) => obj.id === selectedObjective)
+                        ?.name
+                    }
                   </span>
                 )}
               </CardDescription>
@@ -574,7 +688,11 @@ export default function AnalyticsPage() {
                 <Collapsible
                   key={insight.id}
                   open={openInsight === insight.id}
-                  onOpenChange={() => setOpenInsight(openInsight === insight.id ? null : insight.id)}
+                  onOpenChange={() =>
+                    setOpenInsight(
+                      openInsight === insight.id ? null : insight.id,
+                    )
+                  }
                   className="border rounded-lg bg-white"
                 >
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left">
@@ -582,7 +700,9 @@ export default function AnalyticsPage() {
                       {insight.icon}
                       <div>
                         <h3 className="font-medium">{insight.title}</h3>
-                        <p className="text-sm text-muted-foreground">{insight.summary}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {insight.summary}
+                        </p>
                       </div>
                     </div>
                     <Badge
@@ -612,11 +732,15 @@ export default function AnalyticsPage() {
                   <CollapsibleContent className="px-4 pb-4 pt-0 border-t">
                     <div className="mt-3 space-y-4">
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Analysis</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                          Analysis
+                        </h4>
                         <p>{insight.details}</p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Sylvia's Recommendations</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                          Sylvia's Recommendations
+                        </h4>
                         <ul className="space-y-2">
                           {insight.recommendations.map((rec, idx) => (
                             <li key={idx} className="flex items-start gap-2">
@@ -632,7 +756,10 @@ export default function AnalyticsPage() {
               ))}
             </CardContent>
             <CardFooter className="pt-0">
-              <Button variant="outline" className="w-full border-sylvia-200 text-sylvia-700 hover:bg-sylvia-50">
+              <Button
+                variant="outline"
+                className="w-full border-sylvia-200 text-sylvia-700 hover:bg-sylvia-50"
+              >
                 <Brain className="mr-2 h-4 w-4" />
                 Generate More Insights
               </Button>
@@ -643,34 +770,46 @@ export default function AnalyticsPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Responses</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Responses
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.totalResponses}</div>
+                <div className="text-2xl font-bold">
+                  {analytics.totalResponses}
+                </div>
                 <div className="flex items-center mt-1">
                   <Badge className="bg-green-100 text-green-800 border-0">
                     <ArrowUpRight className="h-3 w-3 mr-1" />
                     25% increase
                   </Badge>
-                  <span className="text-xs text-muted-foreground ml-2">vs. previous month</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    vs. previous month
+                  </span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Satisfaction</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Avg Satisfaction
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.averageSatisfaction}/5</div>
+                <div className="text-2xl font-bold">
+                  {analytics.averageSatisfaction}/5
+                </div>
                 <div className="flex items-center mt-1">
                   <Badge className="bg-green-100 text-green-800 border-0">
                     <ArrowUpRight className="h-3 w-3 mr-1" />
                     0.3 points
                   </Badge>
-                  <span className="text-xs text-muted-foreground ml-2">vs. previous month</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    vs. previous month
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -686,24 +825,32 @@ export default function AnalyticsPage() {
                   <Badge className="bg-green-100 text-green-800 border-0">
                     <ArrowUpRight className="h-3 w-3 mr-1" />8 points
                   </Badge>
-                  <span className="text-xs text-muted-foreground ml-2">vs. previous month</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    vs. previous month
+                  </span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Completion Rate
+                </CardTitle>
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{analytics.completionRate}%</div>
+                <div className="text-2xl font-bold">
+                  {analytics.completionRate}%
+                </div>
                 <div className="flex items-center mt-1">
                   <Badge className="bg-amber-100 text-amber-800 border-0">
                     <ArrowDownRight className="h-3 w-3 mr-1" />
                     2%
                   </Badge>
-                  <span className="text-xs text-muted-foreground ml-2">vs. previous month</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    vs. previous month
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -713,11 +860,30 @@ export default function AnalyticsPage() {
           <Tabs defaultValue="trends">
             <div className="tabs-container overflow-x-auto pb-2 -mx-4 px-4">
               <TabsList className="tabs-list-responsive w-full max-w-none min-w-max grid-cols-5 mb-6 gap-1">
-                <TabsTrigger value="trends" className="tabs-trigger-responsive">Trends</TabsTrigger>
-                <TabsTrigger value="segments" className="tabs-trigger-responsive">Segments</TabsTrigger>
-                <TabsTrigger value="feedback" className="tabs-trigger-responsive">Verbatim Feedback</TabsTrigger>
-                <TabsTrigger value="features" className="tabs-trigger-responsive">Feature Analysis</TabsTrigger>
-                <TabsTrigger value="churn" className="tabs-trigger-responsive">Churn Analysis</TabsTrigger>
+                <TabsTrigger value="trends" className="tabs-trigger-responsive">
+                  Trends
+                </TabsTrigger>
+                <TabsTrigger
+                  value="segments"
+                  className="tabs-trigger-responsive"
+                >
+                  Segments
+                </TabsTrigger>
+                <TabsTrigger
+                  value="feedback"
+                  className="tabs-trigger-responsive"
+                >
+                  Verbatim Feedback
+                </TabsTrigger>
+                <TabsTrigger
+                  value="features"
+                  className="tabs-trigger-responsive"
+                >
+                  Feature Analysis
+                </TabsTrigger>
+                <TabsTrigger value="churn" className="tabs-trigger-responsive">
+                  Churn Analysis
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -727,7 +893,9 @@ export default function AnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Satisfaction Trend</CardTitle>
-                    <CardDescription>Average satisfaction score over time</CardDescription>
+                    <CardDescription>
+                      Average satisfaction score over time
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="h-[340px] overflow-x-auto">
                     <ChartContainer
@@ -763,7 +931,9 @@ export default function AnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>NPS Trend</CardTitle>
-                    <CardDescription>Net Promoter Score over time</CardDescription>
+                    <CardDescription>
+                      Net Promoter Score over time
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="h-[340px] overflow-x-auto">
                     <ChartContainer
@@ -800,7 +970,9 @@ export default function AnalyticsPage() {
               <Card className="h-full min-h-[340px]">
                 <CardHeader>
                   <CardTitle>NPS Breakdown</CardTitle>
-                  <CardDescription>Distribution of promoters, passives, and detractors</CardDescription>
+                  <CardDescription>
+                    Distribution of promoters, passives, and detractors
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="h-[340px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -831,7 +1003,9 @@ export default function AnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Satisfaction by Role</CardTitle>
-                    <CardDescription>How different roles rate their satisfaction</CardDescription>
+                    <CardDescription>
+                      How different roles rate their satisfaction
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="h-[340px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -846,7 +1020,14 @@ export default function AnalyticsPage() {
                           label
                         >
                           {satisfactionByRoleData.map((entry, index) => (
-                            <Cell key={`cell-role-${index}`} fill={["#7c3aed", "#06b6d4", "#f59e42", "#a3e635"][index % 4]} />
+                            <Cell
+                              key={`cell-role-${index}`}
+                              fill={
+                                ["#7c3aed", "#06b6d4", "#f59e42", "#a3e635"][
+                                  index % 4
+                                ]
+                              }
+                            />
                           ))}
                         </Pie>
                         <Legend />
@@ -858,7 +1039,9 @@ export default function AnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Response Distribution</CardTitle>
-                    <CardDescription>Breakdown of responses by company size</CardDescription>
+                    <CardDescription>
+                      Breakdown of responses by company size
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -889,7 +1072,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Customer Tenure</CardTitle>
-                  <CardDescription>How long customers have been using the product</CardDescription>
+                  <CardDescription>
+                    How long customers have been using the product
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -929,7 +1114,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Customer Quotes</CardTitle>
-                  <CardDescription>Direct feedback from survey respondents</CardDescription>
+                  <CardDescription>
+                    Direct feedback from survey respondents
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {customerQuotes.map((quote) => (
@@ -953,14 +1140,16 @@ export default function AnalyticsPage() {
                               <AvatarFallback className="text-xs">
                                 {quote.author
                                   ? quote.author
-                                  .split(" ")
-                                  .map((n) => n[0])
+                                      .split(" ")
+                                      .map((n) => n[0])
                                       .join("")
                                   : "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-sm">
-                              <span className="font-medium">{quote.author}</span>
+                              <span className="font-medium">
+                                {quote.author}
+                              </span>
                               <span className="text-muted-foreground">
                                 {" "}
                                 · {quote.role}, {quote.company}
@@ -987,14 +1176,20 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Sentiment Analysis</CardTitle>
-                  <CardDescription>AI-powered analysis of open-ended responses</CardDescription>
+                  <CardDescription>
+                    AI-powered analysis of open-ended responses
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-sm font-medium">Overall Sentiment</h3>
-                        <Badge className="bg-green-100 text-green-800 border-0">78% Positive</Badge>
+                        <h3 className="text-sm font-medium">
+                          Overall Sentiment
+                        </h3>
+                        <Badge className="bg-green-100 text-green-800 border-0">
+                          78% Positive
+                        </Badge>
                       </div>
                       <div className="flex h-2 rounded-full overflow-hidden">
                         <div className="bg-green-500 w-[78%]" />
@@ -1011,7 +1206,9 @@ export default function AnalyticsPage() {
                     <Separator />
 
                     <div>
-                      <h3 className="text-sm font-medium mb-3">Sentiment by Feature</h3>
+                      <h3 className="text-sm font-medium mb-3">
+                        Sentiment by Feature
+                      </h3>
                       <ChartContainer
                         config={{
                           positive: {
@@ -1026,14 +1223,25 @@ export default function AnalyticsPage() {
                         className="h-[250px]"
                       >
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={sentimentByFeatureData} layout="vertical">
+                          <BarChart
+                            data={sentimentByFeatureData}
+                            layout="vertical"
+                          >
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis type="number" domain={[0, 100]} />
                             <YAxis dataKey="name" type="category" width={80} />
                             <ChartTooltip content={<ChartTooltipContent />} />
                             <Legend />
-                            <Bar dataKey="positive" stackId="a" fill="var(--color-positive)" />
-                            <Bar dataKey="negative" stackId="a" fill="var(--color-negative)" />
+                            <Bar
+                              dataKey="positive"
+                              stackId="a"
+                              fill="var(--color-positive)"
+                            />
+                            <Bar
+                              dataKey="negative"
+                              stackId="a"
+                              fill="var(--color-negative)"
+                            />
                           </BarChart>
                         </ResponsiveContainer>
                       </ChartContainer>
@@ -1048,7 +1256,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Feature Usage</CardTitle>
-                  <CardDescription>Most used features based on survey responses</CardDescription>
+                  <CardDescription>
+                    Most used features based on survey responses
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer
@@ -1077,12 +1287,17 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Top Feature Requests</CardTitle>
-                  <CardDescription>Most requested features from survey responses</CardDescription>
+                  <CardDescription>
+                    Most requested features from survey responses
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {analytics.topFeatureRequests.map((feature, index) => (
-                      <div key={index} className="flex items-center justify-between">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between"
+                      >
                         <span className="text-sm">{feature}</span>
                         <Badge variant="outline">
                           {5 - index} mention{index < 4 ? "s" : ""}
@@ -1096,17 +1311,22 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle>Feature Gap Analysis</CardTitle>
-                  <CardDescription>Comparing feature importance vs. satisfaction</CardDescription>
+                  <CardDescription>
+                    Comparing feature importance vs. satisfaction
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-medium text-amber-800">Opportunity Alert</h4>
+                        <h4 className="font-medium text-amber-800">
+                          Opportunity Alert
+                        </h4>
                         <p className="text-sm text-amber-700">
-                          API Documentation has high importance (85%) but low satisfaction (65%). This represents a key
-                          improvement opportunity.
+                          API Documentation has high importance (85%) but low
+                          satisfaction (65%). This represents a key improvement
+                          opportunity.
                         </p>
                       </div>
                     </div>
@@ -1121,7 +1341,9 @@ export default function AnalyticsPage() {
                 <Card className="h-full min-h-[340px]">
                   <CardHeader>
                     <CardTitle>Churn Reasons</CardTitle>
-                    <CardDescription>Top reasons for customer churn</CardDescription>
+                    <CardDescription>
+                      Top reasons for customer churn
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="h-[340px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -1136,7 +1358,19 @@ export default function AnalyticsPage() {
                           label
                         >
                           {churnReasonData.map((entry, index) => (
-                            <Cell key={`cell-churn-${index}`} fill={["#f59e42", "#ef4444", "#06b6d4", "#7c3aed", "#a3e635", "#fbbf24"][index % 6]} />
+                            <Cell
+                              key={`cell-churn-${index}`}
+                              fill={
+                                [
+                                  "#f59e42",
+                                  "#ef4444",
+                                  "#06b6d4",
+                                  "#7c3aed",
+                                  "#a3e635",
+                                  "#fbbf24",
+                                ][index % 6]
+                              }
+                            />
                           ))}
                         </Pie>
                         <Legend />
@@ -1148,7 +1382,9 @@ export default function AnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Churn by Segment</CardTitle>
-                    <CardDescription>Churn rate and average tenure by segment</CardDescription>
+                    <CardDescription>
+                      Churn rate and average tenure by segment
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={220}>
@@ -1158,8 +1394,16 @@ export default function AnalyticsPage() {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="churnRate" fill="#ef4444" name="Churn Rate (%)" />
-                        <Bar dataKey="avgTenure" fill="#06b6d4" name="Avg Tenure (months)" />
+                        <Bar
+                          dataKey="churnRate"
+                          fill="#ef4444"
+                          name="Churn Rate (%)"
+                        />
+                        <Bar
+                          dataKey="avgTenure"
+                          fill="#06b6d4"
+                          name="Avg Tenure (months)"
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -1169,7 +1413,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Churned Customer Quotes</CardTitle>
-                  <CardDescription>Direct feedback from churned customers</CardDescription>
+                  <CardDescription>
+                    Direct feedback from churned customers
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {churnedCustomerQuotes.map((quote) => (
@@ -1193,14 +1439,16 @@ export default function AnalyticsPage() {
                               <AvatarFallback className="text-xs">
                                 {quote.author
                                   ? quote.author
-                                  .split(" ")
-                                  .map((n) => n[0])
+                                      .split(" ")
+                                      .map((n) => n[0])
                                       .join("")
                                   : "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-sm">
-                              <span className="font-medium">{quote.author}</span>
+                              <span className="font-medium">
+                                {quote.author}
+                              </span>
                               <span className="text-muted-foreground">
                                 {" "}
                                 · {quote.role}, {quote.company}
@@ -1228,5 +1476,5 @@ export default function AnalyticsPage() {
         </>
       )}
     </div>
-  )
+  );
 }

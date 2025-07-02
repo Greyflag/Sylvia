@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { FileQuestion } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { FileQuestion } from "lucide-react";
 
 export default function QuestionSetNotFound() {
   return (
@@ -10,11 +10,12 @@ export default function QuestionSetNotFound() {
       </div>
       <h1 className="text-3xl font-bold mb-2">Question Set Not Found</h1>
       <p className="text-muted-foreground mb-6 max-w-md">
-        The question set you're looking for doesn't exist or you don't have access to it.
+        The question set you're looking for doesn't exist or you don't have
+        access to it.
       </p>
       <Button asChild>
         <Link href="/">Return to Dashboard</Link>
       </Button>
     </div>
-  )
+  );
 }

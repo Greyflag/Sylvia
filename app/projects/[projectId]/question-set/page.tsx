@@ -1,14 +1,37 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getProjectQuestionSet, createQuestion, updateProject } from "@/lib/data-service"
-import { useProject } from "@/components/project-context"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  getProjectQuestionSet,
+  createQuestion,
+  updateProject,
+} from "@/lib/data-service";
+import { useProject } from "@/components/project-context";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -17,12 +40,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   CheckCircle,
   Edit,
@@ -44,8 +67,8 @@ import {
   Globe,
   Search,
   Brain,
-} from "lucide-react"
-import Link from "next/link"
+} from "lucide-react";
+import Link from "next/link";
 import {
   DndContext,
   closestCenter,
@@ -54,15 +77,15 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core"
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 // Sortable table row component
 function SortableTableRow({ question, index, onEdit, onDelete }: any) {
@@ -73,13 +96,13 @@ function SortableTableRow({ question, index, onEdit, onDelete }: any) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: question.id })
+  } = useSortable({ id: question.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  }
+  };
 
   return (
     <TableRow ref={setNodeRef} style={style}>
@@ -98,7 +121,8 @@ function SortableTableRow({ question, index, onEdit, onDelete }: any) {
       <TableCell>{question.text}</TableCell>
       <TableCell>
         <Badge variant="outline">
-          {questionTypes.find((t) => t.id === question.type)?.name || question.type}
+          {questionTypes.find((t) => t.id === question.type)?.name ||
+            question.type}
         </Badge>
       </TableCell>
       <TableCell>{question.section}</TableCell>
@@ -122,7 +146,7 @@ function SortableTableRow({ question, index, onEdit, onDelete }: any) {
         </div>
       </TableCell>
     </TableRow>
-  )
+  );
 }
 
 // Ensure questionTypes is defined at the top-level scope
@@ -171,31 +195,32 @@ const questionTypes = [
     example: "What improvements would you like to see?",
     useCase: "Detailed feedback, suggestions, qualitative insights",
   },
-]
+];
 
 export default function QuestionSetPage() {
-  const params = useParams()
-  const searchParams = useSearchParams()
-  const projectId = params.projectId as string
-  const { currentProject, setCurrentProject } = useProject()
-  const [activeTab, setActiveTab] = useState("all")
-  const [selectedQuestionType, setSelectedQuestionType] = useState("multiple-choice")
-  const [isAddQuestionOpen, setIsAddQuestionOpen] = useState(false)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-  const [isEditQuestionOpen, setIsEditQuestionOpen] = useState(false)
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const projectId = params.projectId as string;
+  const { currentProject, setCurrentProject } = useProject();
+  const [activeTab, setActiveTab] = useState("all");
+  const [selectedQuestionType, setSelectedQuestionType] =
+    useState("multiple-choice");
+  const [isAddQuestionOpen, setIsAddQuestionOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isEditQuestionOpen, setIsEditQuestionOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState({
     text: "",
     type: "multiple-choice",
     section: "General",
     required: false,
     options: [""],
-  })
-  const [editingQuestion, setEditingQuestion] = useState<any>(null)
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
-  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null)
+  });
+  const [editingQuestion, setEditingQuestion] = useState<any>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<string | null>(null);
 
   // NEW: Local state for questions
-  const [questions, setQuestions] = useState<any[]>([])
+  const [questions, setQuestions] = useState<any[]>([]);
 
   // Add state for the auto-generate dialog
   const [isAutoGenerateOpen, setIsAutoGenerateOpen] = useState(false);
@@ -209,28 +234,30 @@ export default function QuestionSetPage() {
 
   // On mount, initialize questions from data-service
   useEffect(() => {
-    const initial = getProjectQuestionSet(projectId)
-    setQuestions(initial)
-  }, [projectId])
+    const initial = getProjectQuestionSet(projectId);
+    setQuestions(initial);
+  }, [projectId]);
 
   // Group questions by section
-  const sections = [...new Set(questions.map((q) => q.section))]
+  const sections = [...new Set(questions.map((q) => q.section))];
 
   // Check if this is the completed project
-  const isCompleted = currentProject?.status === "completed"
+  const isCompleted = currentProject?.status === "completed";
 
-  const selectedType = questionTypes.find((type) => type.id === selectedQuestionType)
+  const selectedType = questionTypes.find(
+    (type) => type.id === selectedQuestionType,
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+    }),
+  );
 
   const handleAddQuestion = () => {
     if (!newQuestion.text.trim()) {
-      return // Don't add empty questions
+      return; // Don't add empty questions
     }
     const question = {
       id: `q${questions.length + 1}_${Date.now()}`,
@@ -238,117 +265,127 @@ export default function QuestionSetPage() {
       type: newQuestion.type,
       section: newQuestion.section,
       required: newQuestion.required,
-      options: newQuestion.type === "open-ended" ? [] : newQuestion.options.filter(opt => opt.trim() !== ""),
-    }
-    setQuestions(prev => [...prev, question])
+      options:
+        newQuestion.type === "open-ended"
+          ? []
+          : newQuestion.options.filter((opt) => opt.trim() !== ""),
+    };
+    setQuestions((prev) => [...prev, question]);
     // Optionally persist
-    createQuestion(projectId, question)
+    createQuestion(projectId, question);
     if (currentProject) {
       const updatedProject = {
         ...currentProject,
         questionSet: [...questions, question],
-      }
-      updateProject(projectId, updatedProject)
-      setCurrentProject(updatedProject)
+      };
+      updateProject(projectId, updatedProject);
+      setCurrentProject(updatedProject);
     }
-    setIsAddQuestionOpen(false)
+    setIsAddQuestionOpen(false);
     setNewQuestion({
       text: "",
       type: "multiple-choice",
       section: "General",
       required: false,
       options: [""],
-    })
-  }
+    });
+  };
 
   const handleSaveDraft = () => {
     if (currentProject) {
       updateProject(projectId, {
         ...currentProject,
         questionSet: questions,
-      })
+      });
     }
-  }
+  };
 
   const handlePreviewSurvey = () => {
-    setIsPreviewOpen(true)
-  }
+    setIsPreviewOpen(true);
+  };
 
   const handleEditQuestion = (question: any) => {
     setEditingQuestion({
       ...question,
-      options: question.options || [""]
-    })
-    setIsEditQuestionOpen(true)
-  }
+      options: question.options || [""],
+    });
+    setIsEditQuestionOpen(true);
+  };
 
   const handleUpdateQuestion = () => {
     if (!editingQuestion.text.trim()) {
-      return
+      return;
     }
     const updatedQuestions = questions.map((q) =>
       q.id === editingQuestion.id
         ? {
             ...editingQuestion,
-            options: editingQuestion.type === "open-ended" ? [] : editingQuestion.options.filter((opt: string) => opt.trim() !== ""),
+            options:
+              editingQuestion.type === "open-ended"
+                ? []
+                : editingQuestion.options.filter(
+                    (opt: string) => opt.trim() !== "",
+                  ),
           }
-        : q
-    )
-    setQuestions(updatedQuestions)
+        : q,
+    );
+    setQuestions(updatedQuestions);
     // Optionally persist
     if (currentProject) {
       const updatedProject = {
         ...currentProject,
         questionSet: updatedQuestions,
-      }
-      updateProject(projectId, updatedProject)
-      setCurrentProject(updatedProject)
+      };
+      updateProject(projectId, updatedProject);
+      setCurrentProject(updatedProject);
     }
-    setIsEditQuestionOpen(false)
-    setEditingQuestion(null)
-  }
+    setIsEditQuestionOpen(false);
+    setEditingQuestion(null);
+  };
 
   const handleDeleteClick = (questionId: string) => {
-    setQuestionToDelete(questionId)
-    setIsDeleteConfirmOpen(true)
-  }
+    setQuestionToDelete(questionId);
+    setIsDeleteConfirmOpen(true);
+  };
 
   const handleDeleteConfirm = () => {
     if (questionToDelete) {
-      const updatedQuestions = questions.filter((q) => q.id !== questionToDelete)
-      setQuestions(updatedQuestions)
+      const updatedQuestions = questions.filter(
+        (q) => q.id !== questionToDelete,
+      );
+      setQuestions(updatedQuestions);
       // Optionally persist
       if (currentProject) {
         const updatedProject = {
           ...currentProject,
           questionSet: updatedQuestions,
-        }
-        updateProject(projectId, updatedProject)
-        setCurrentProject(updatedProject)
+        };
+        updateProject(projectId, updatedProject);
+        setCurrentProject(updatedProject);
       }
-      setIsDeleteConfirmOpen(false)
-      setQuestionToDelete(null)
+      setIsDeleteConfirmOpen(false);
+      setQuestionToDelete(null);
     }
-  }
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = questions.findIndex((q) => q.id === active.id)
-      const newIndex = questions.findIndex((q) => q.id === over.id)
-      const updatedQuestions = arrayMove(questions, oldIndex, newIndex)
-      setQuestions(updatedQuestions)
+      const oldIndex = questions.findIndex((q) => q.id === active.id);
+      const newIndex = questions.findIndex((q) => q.id === over.id);
+      const updatedQuestions = arrayMove(questions, oldIndex, newIndex);
+      setQuestions(updatedQuestions);
       // Optionally persist
       if (currentProject) {
         const updatedProject = {
           ...currentProject,
           questionSet: updatedQuestions,
-        }
-        updateProject(projectId, updatedProject)
-        setCurrentProject(updatedProject)
+        };
+        updateProject(projectId, updatedProject);
+        setCurrentProject(updatedProject);
       }
     }
-  }
+  };
 
   // Handler for AI Generate
   const handleAIGenerate = () => {
@@ -360,7 +397,7 @@ export default function QuestionSetPage() {
       "Scouring the web for the latest research...",
       "Analyzing articles and extracting insights...",
       "Synthesizing survey questions...",
-      "Finalizing your custom question set..."
+      "Finalizing your custom question set...",
     ];
     let step = 0;
     const interval = setInterval(() => {
@@ -402,7 +439,13 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "General",
           required: true,
-          options: ["Definitely yes", "Probably yes", "Not sure", "Probably not", "Definitely not"],
+          options: [
+            "Definitely yes",
+            "Probably yes",
+            "Not sure",
+            "Probably not",
+            "Definitely not",
+          ],
         },
         {
           id: "q4",
@@ -410,7 +453,13 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "Features",
           required: false,
-          options: ["Data Analytics", "Reporting Tools", "Integration Capabilities", "User Interface", "Customer Support"],
+          options: [
+            "Data Analytics",
+            "Reporting Tools",
+            "Integration Capabilities",
+            "User Interface",
+            "Customer Support",
+          ],
         },
         {
           id: "q5",
@@ -444,7 +493,7 @@ export default function QuestionSetPage() {
             "Marketing Specialist",
             "IT Administrator",
             "Research Coordinator",
-            "Other"
+            "Other",
           ],
         },
         {
@@ -459,7 +508,7 @@ export default function QuestionSetPage() {
             "Decision maker for purchases",
             "Administrator/manager",
             "Technical support contact",
-            "Not directly involved"
+            "Not directly involved",
           ],
         },
         {
@@ -473,7 +522,7 @@ export default function QuestionSetPage() {
             "Influenced the decision",
             "Provided input but didn't decide",
             "Was informed of the decision",
-            "Not involved in the process"
+            "Not involved in the process",
           ],
         },
         {
@@ -490,7 +539,7 @@ export default function QuestionSetPage() {
             "$500K-$1M",
             "$1M-$2M",
             "$2M-$5M",
-            "Over $5M"
+            "Over $5M",
           ],
         },
         {
@@ -508,7 +557,16 @@ export default function QuestionSetPage() {
           section: "Platform Experience",
           required: true,
           options: [
-            "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017 or earlier", "Don't remember"
+            "2025",
+            "2024",
+            "2023",
+            "2022",
+            "2021",
+            "2020",
+            "2019",
+            "2018",
+            "2017 or earlier",
+            "Don't remember",
           ],
         },
         {
@@ -544,7 +602,7 @@ export default function QuestionSetPage() {
             "Found a better alternative solution",
             "Reduced need for this type of platform",
             "Technical problems or reliability issues",
-            "Other"
+            "Other",
           ],
         },
       ];
@@ -556,7 +614,14 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "Usage Patterns",
           required: false,
-          options: ["Multiple times daily", "Daily", "Weekly", "Monthly", "Rarely", "Never used it"],
+          options: [
+            "Multiple times daily",
+            "Daily",
+            "Weekly",
+            "Monthly",
+            "Rarely",
+            "Never used it",
+          ],
         },
         {
           id: "usage-2",
@@ -599,7 +664,13 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "User Experience",
           required: false,
-          options: ["Extremely intuitive", "Very intuitive", "Somewhat intuitive", "Not very intuitive", "Very difficult to use"],
+          options: [
+            "Extremely intuitive",
+            "Very intuitive",
+            "Somewhat intuitive",
+            "Not very intuitive",
+            "Very difficult to use",
+          ],
         },
         {
           id: "detailed-2",
@@ -607,7 +678,11 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "Support",
           required: false,
-          options: ["Yes, multiple times", "Yes, once or twice", "No, never needed to"],
+          options: [
+            "Yes, multiple times",
+            "Yes, once or twice",
+            "No, never needed to",
+          ],
         },
         {
           id: "detailed-3",
@@ -615,7 +690,13 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "Support",
           required: false,
-          options: ["Completely satisfied", "Mostly satisfied", "Somewhat satisfied", "Not very satisfied", "Not satisfied at all"],
+          options: [
+            "Completely satisfied",
+            "Mostly satisfied",
+            "Somewhat satisfied",
+            "Not very satisfied",
+            "Not satisfied at all",
+          ],
         },
         {
           id: "detailed-4",
@@ -623,7 +704,14 @@ export default function QuestionSetPage() {
           type: "multiple-choice",
           section: "Communication",
           required: false,
-          options: ["Email newsletters", "In-app notifications", "Phone calls", "Webinars", "Documentation updates", "No preference"],
+          options: [
+            "Email newsletters",
+            "In-app notifications",
+            "Phone calls",
+            "Webinars",
+            "Documentation updates",
+            "No preference",
+          ],
         },
         {
           id: "detailed-5",
@@ -648,7 +736,9 @@ export default function QuestionSetPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Question Set</h1>
-          <p className="text-muted-foreground mt-1">Design and manage your survey questions</p>
+          <p className="text-muted-foreground mt-1">
+            Design and manage your survey questions
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2">
@@ -660,7 +750,11 @@ export default function QuestionSetPage() {
               <Sparkles className="mr-2 h-4 w-4" />
               Auto-Generate
             </Button>
-            <Button className="bg-sylvia-600 hover:bg-sylvia-700" size="sm" onClick={() => setIsAddQuestionOpen(true)}>
+            <Button
+              className="bg-sylvia-600 hover:bg-sylvia-700"
+              size="sm"
+              onClick={() => setIsAddQuestionOpen(true)}
+            >
               + Add Question
             </Button>
           </div>
@@ -679,7 +773,8 @@ export default function QuestionSetPage() {
               <h2 className="text-lg font-medium">Question Set Complete</h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              This question set has been finalized and used in the survey. You can view the questions below.
+              This question set has been finalized and used in the survey. You
+              can view the questions below.
             </p>
           </CardContent>
         </Card>
@@ -691,8 +786,9 @@ export default function QuestionSetPage() {
               <h2 className="text-lg font-medium">Getting Started</h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              Create your survey questions based on your research objectives. You can add different question types and
-              organize them into sections.
+              Create your survey questions based on your research objectives.
+              You can add different question types and organize them into
+              sections.
             </p>
             <div className="flex flex-wrap gap-2">
               {questionTypes.map((type) => (
@@ -707,12 +803,21 @@ export default function QuestionSetPage() {
 
       <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <div className="tabs-container overflow-x-auto pb-2 -mx-4 px-4">
-          <TabsList className="tabs-list-responsive w-full max-w-none min-w-max gap-1" style={{ 
-            gridTemplateColumns: `repeat(${sections.length + 1}, minmax(120px, 1fr))` 
-          }}>
-            <TabsTrigger value="all" className="tabs-trigger-responsive">All Questions</TabsTrigger>
+          <TabsList
+            className="tabs-list-responsive w-full max-w-none min-w-max gap-1"
+            style={{
+              gridTemplateColumns: `repeat(${sections.length + 1}, minmax(120px, 1fr))`,
+            }}
+          >
+            <TabsTrigger value="all" className="tabs-trigger-responsive">
+              All Questions
+            </TabsTrigger>
             {sections.map((section) => (
-              <TabsTrigger key={section} value={section.toLowerCase()} className="tabs-trigger-responsive">
+              <TabsTrigger
+                key={section}
+                value={section.toLowerCase()}
+                className="tabs-trigger-responsive"
+              >
                 {section}
               </TabsTrigger>
             ))}
@@ -723,14 +828,23 @@ export default function QuestionSetPage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>All Questions ({questions.length})</CardTitle>
-              <CardDescription>View and manage all questions in your survey</CardDescription>
+              <CardDescription>
+                View and manage all questions in your survey
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {questions.length === 0 ? (
                 <div className="text-center py-12">
                   <span className="block text-4xl text-gray-300 mb-2">?</span>
-                  <span className="font-medium text-gray-500">No questions added yet</span><br/>
-                  <span className="text-sm text-gray-400 mb-2">Get started by adding questions manually or using AI generation</span><br/>
+                  <span className="font-medium text-gray-500">
+                    No questions added yet
+                  </span>
+                  <br />
+                  <span className="text-sm text-gray-400 mb-2">
+                    Get started by adding questions manually or using AI
+                    generation
+                  </span>
+                  <br />
                   <span>
                     <Button
                       variant="outline"
@@ -791,13 +905,20 @@ export default function QuestionSetPage() {
         </TabsContent>
 
         {sections.map((section) => (
-          <TabsContent key={section} value={section.toLowerCase()} className="mt-6 tabs-content">
+          <TabsContent
+            key={section}
+            value={section.toLowerCase()}
+            className="mt-6 tabs-content"
+          >
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle>
-                  {section} Questions ({questions.filter((q) => q.section === section).length})
+                  {section} Questions (
+                  {questions.filter((q) => q.section === section).length})
                 </CardTitle>
-                <CardDescription>Questions related to {section.toLowerCase()}</CardDescription>
+                <CardDescription>
+                  Questions related to {section.toLowerCase()}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -808,7 +929,9 @@ export default function QuestionSetPage() {
                       <TableHead>Type</TableHead>
                       <TableHead>Subsection</TableHead>
                       <TableHead>Required</TableHead>
-                      {!isCompleted && <TableHead className="text-right">Actions</TableHead>}
+                      {!isCompleted && (
+                        <TableHead className="text-right">Actions</TableHead>
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -816,7 +939,9 @@ export default function QuestionSetPage() {
                       .filter((q) => q.section === section)
                       .map((question, index) => (
                         <TableRow key={question.id}>
-                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="font-medium">
+                            {index + 1}
+                          </TableCell>
                           <TableCell>{question.text}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="capitalize">
@@ -824,7 +949,9 @@ export default function QuestionSetPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>{question.subSection}</TableCell>
-                          <TableCell>{question.required ? "Yes" : "No"}</TableCell>
+                          <TableCell>
+                            {question.required ? "Yes" : "No"}
+                          </TableCell>
                           {!isCompleted && (
                             <TableCell className="text-right">
                               <Button variant="ghost" size="icon">
@@ -856,7 +983,8 @@ export default function QuestionSetPage() {
           <DialogHeader>
             <DialogTitle>Add New Question</DialogTitle>
             <DialogDescription>
-              Create a new question for your survey. Choose the type and provide the necessary details.
+              Create a new question for your survey. Choose the type and provide
+              the necessary details.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -865,7 +993,9 @@ export default function QuestionSetPage() {
               <Textarea
                 id="question-text"
                 value={newQuestion.text}
-                onChange={(e) => setNewQuestion({ ...newQuestion, text: e.target.value })}
+                onChange={(e) =>
+                  setNewQuestion({ ...newQuestion, text: e.target.value })
+                }
                 placeholder="Enter your question here..."
               />
             </div>
@@ -873,7 +1003,9 @@ export default function QuestionSetPage() {
               <Label htmlFor="question-type">Question Type</Label>
               <Select
                 value={newQuestion.type}
-                onValueChange={(value) => setNewQuestion({ ...newQuestion, type: value })}
+                onValueChange={(value) =>
+                  setNewQuestion({ ...newQuestion, type: value })
+                }
               >
                 <SelectTrigger id="question-type">
                   <SelectValue placeholder="Select question type" />
@@ -891,7 +1023,9 @@ export default function QuestionSetPage() {
               <Label htmlFor="question-section">Section</Label>
               <Select
                 value={newQuestion.section}
-                onValueChange={(value) => setNewQuestion({ ...newQuestion, section: value })}
+                onValueChange={(value) =>
+                  setNewQuestion({ ...newQuestion, section: value })
+                }
               >
                 <SelectTrigger id="question-section">
                   <SelectValue placeholder="Select section" />
@@ -906,7 +1040,8 @@ export default function QuestionSetPage() {
                 </SelectContent>
               </Select>
             </div>
-            {(newQuestion.type === "multiple-choice" || newQuestion.type === "checkbox") && (
+            {(newQuestion.type === "multiple-choice" ||
+              newQuestion.type === "checkbox") && (
               <div className="space-y-2">
                 <Label>Options</Label>
                 {newQuestion.options.map((option: string, index: number) => (
@@ -914,9 +1049,9 @@ export default function QuestionSetPage() {
                     <Input
                       value={option}
                       onChange={(e) => {
-                        const newOptions = [...newQuestion.options]
-                        newOptions[index] = e.target.value
-                        setNewQuestion({ ...newQuestion, options: newOptions })
+                        const newOptions = [...newQuestion.options];
+                        newOptions[index] = e.target.value;
+                        setNewQuestion({ ...newQuestion, options: newOptions });
                       }}
                       placeholder={`Option ${index + 1}`}
                     />
@@ -925,8 +1060,13 @@ export default function QuestionSetPage() {
                         variant="outline"
                         size="icon"
                         onClick={() => {
-                          const newOptions = newQuestion.options.filter((_: string, i: number) => i !== index)
-                          setNewQuestion({ ...newQuestion, options: newOptions })
+                          const newOptions = newQuestion.options.filter(
+                            (_: string, i: number) => i !== index,
+                          );
+                          setNewQuestion({
+                            ...newQuestion,
+                            options: newOptions,
+                          });
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -936,7 +1076,12 @@ export default function QuestionSetPage() {
                 ))}
                 <Button
                   variant="outline"
-                  onClick={() => setNewQuestion({ ...newQuestion, options: [...newQuestion.options, ""] })}
+                  onClick={() =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      options: [...newQuestion.options, ""],
+                    })
+                  }
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Option
@@ -948,13 +1093,18 @@ export default function QuestionSetPage() {
                 type="checkbox"
                 id="required"
                 checked={newQuestion.required}
-                onChange={(e) => setNewQuestion({ ...newQuestion, required: e.target.checked })}
+                onChange={(e) =>
+                  setNewQuestion({ ...newQuestion, required: e.target.checked })
+                }
               />
               <Label htmlFor="required">Required Question</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddQuestionOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddQuestionOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleAddQuestion}>Add Question</Button>
@@ -994,28 +1144,32 @@ export default function QuestionSetPage() {
                     </p>
                     {question.type === "multiple-choice" && (
                       <div className="mt-2 space-y-2">
-                        {question.options.map((option: string, optionIndex: number) => (
-                          <div
-                            key={optionIndex}
-                            className="flex items-center gap-2 text-sm text-gray-600"
-                          >
-                            <div className="w-4 h-4 border rounded-full" />
-                            <span>{option}</span>
-                          </div>
-                        ))}
+                        {question.options.map(
+                          (option: string, optionIndex: number) => (
+                            <div
+                              key={optionIndex}
+                              className="flex items-center gap-2 text-sm text-gray-600"
+                            >
+                              <div className="w-4 h-4 border rounded-full" />
+                              <span>{option}</span>
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
                     {question.type === "checkbox" && (
                       <div className="mt-2 space-y-2">
-                        {question.options.map((option: string, optionIndex: number) => (
-                          <div
-                            key={optionIndex}
-                            className="flex items-center gap-2 text-sm text-gray-600"
-                          >
-                            <div className="w-4 h-4 border rounded" />
-                            <span>{option}</span>
-                          </div>
-                        ))}
+                        {question.options.map(
+                          (option: string, optionIndex: number) => (
+                            <div
+                              key={optionIndex}
+                              className="flex items-center gap-2 text-sm text-gray-600"
+                            >
+                              <div className="w-4 h-4 border rounded" />
+                              <span>{option}</span>
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
                     {question.type === "open-ended" && (
@@ -1048,7 +1202,12 @@ export default function QuestionSetPage() {
               <Textarea
                 id="edit-question-text"
                 value={editingQuestion?.text || ""}
-                onChange={(e) => setEditingQuestion({ ...editingQuestion, text: e.target.value })}
+                onChange={(e) =>
+                  setEditingQuestion({
+                    ...editingQuestion,
+                    text: e.target.value,
+                  })
+                }
                 placeholder="Enter your question here..."
               />
             </div>
@@ -1056,7 +1215,9 @@ export default function QuestionSetPage() {
               <Label htmlFor="edit-question-type">Question Type</Label>
               <Select
                 value={editingQuestion?.type || "multiple-choice"}
-                onValueChange={(value) => setEditingQuestion({ ...editingQuestion, type: value })}
+                onValueChange={(value) =>
+                  setEditingQuestion({ ...editingQuestion, type: value })
+                }
               >
                 <SelectTrigger id="edit-question-type">
                   <SelectValue placeholder="Select question type" />
@@ -1074,7 +1235,9 @@ export default function QuestionSetPage() {
               <Label htmlFor="edit-question-section">Section</Label>
               <Select
                 value={editingQuestion?.section || "General"}
-                onValueChange={(value) => setEditingQuestion({ ...editingQuestion, section: value })}
+                onValueChange={(value) =>
+                  setEditingQuestion({ ...editingQuestion, section: value })
+                }
               >
                 <SelectTrigger id="edit-question-section">
                   <SelectValue placeholder="Select section" />
@@ -1089,37 +1252,53 @@ export default function QuestionSetPage() {
                 </SelectContent>
               </Select>
             </div>
-            {(editingQuestion?.type === "multiple-choice" || editingQuestion?.type === "checkbox") && (
+            {(editingQuestion?.type === "multiple-choice" ||
+              editingQuestion?.type === "checkbox") && (
               <div className="space-y-2">
                 <Label>Options</Label>
-                {editingQuestion?.options.map((option: string, index: number) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={option}
-                      onChange={(e) => {
-                        const newOptions = [...editingQuestion.options]
-                        newOptions[index] = e.target.value
-                        setEditingQuestion({ ...editingQuestion, options: newOptions })
-                      }}
-                      placeholder={`Option ${index + 1}`}
-                    />
-                    {index > 0 && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          const newOptions = editingQuestion.options.filter((_: string, i: number) => i !== index)
-                          setEditingQuestion({ ...editingQuestion, options: newOptions })
+                {editingQuestion?.options.map(
+                  (option: string, index: number) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...editingQuestion.options];
+                          newOptions[index] = e.target.value;
+                          setEditingQuestion({
+                            ...editingQuestion,
+                            options: newOptions,
+                          });
                         }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                        placeholder={`Option ${index + 1}`}
+                      />
+                      {index > 0 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            const newOptions = editingQuestion.options.filter(
+                              (_: string, i: number) => i !== index,
+                            );
+                            setEditingQuestion({
+                              ...editingQuestion,
+                              options: newOptions,
+                            });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ),
+                )}
                 <Button
                   variant="outline"
-                  onClick={() => setEditingQuestion({ ...editingQuestion, options: [...editingQuestion.options, ""] })}
+                  onClick={() =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      options: [...editingQuestion.options, ""],
+                    })
+                  }
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Option
@@ -1131,13 +1310,21 @@ export default function QuestionSetPage() {
                 type="checkbox"
                 id="edit-required"
                 checked={editingQuestion?.required || false}
-                onChange={(e) => setEditingQuestion({ ...editingQuestion, required: e.target.checked })}
+                onChange={(e) =>
+                  setEditingQuestion({
+                    ...editingQuestion,
+                    required: e.target.checked,
+                  })
+                }
               />
               <Label htmlFor="edit-required">Required Question</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditQuestionOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditQuestionOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleUpdateQuestion}>Save Changes</Button>
@@ -1150,11 +1337,15 @@ export default function QuestionSetPage() {
           <DialogHeader>
             <DialogTitle>Delete Question</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this question? This action cannot be undone.
+              Are you sure you want to delete this question? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteConfirmOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDeleteConfirm}>
@@ -1169,7 +1360,8 @@ export default function QuestionSetPage() {
           <DialogHeader>
             <DialogTitle>AI Question Generation</DialogTitle>
             <DialogDescription>
-              Let our AI generate survey questions based on your project objectives and industry best practices.
+              Let our AI generate survey questions based on your project
+              objectives and industry best practices.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -1180,17 +1372,30 @@ export default function QuestionSetPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Customer Satisfaction">Customer Satisfaction</SelectItem>
-                  <SelectItem value="Employee Engagement">Employee Engagement</SelectItem>
-                  <SelectItem value="Product Feedback">Product Feedback</SelectItem>
-                  <SelectItem value="Market Research">Market Research</SelectItem>
-                  <SelectItem value="Brand Awareness">Brand Awareness</SelectItem>
+                  <SelectItem value="Customer Satisfaction">
+                    Customer Satisfaction
+                  </SelectItem>
+                  <SelectItem value="Employee Engagement">
+                    Employee Engagement
+                  </SelectItem>
+                  <SelectItem value="Product Feedback">
+                    Product Feedback
+                  </SelectItem>
+                  <SelectItem value="Market Research">
+                    Market Research
+                  </SelectItem>
+                  <SelectItem value="Brand Awareness">
+                    Brand Awareness
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label htmlFor="industry-context">Industry Context</Label>
-              <Select value={industryContext} onValueChange={setIndustryContext}>
+              <Select
+                value={industryContext}
+                onValueChange={setIndustryContext}
+              >
                 <SelectTrigger id="industry-context">
                   <SelectValue />
                 </SelectTrigger>
@@ -1219,21 +1424,29 @@ export default function QuestionSetPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="auto-context">Additional Context (Optional)</Label>
-            <Textarea
+              <Label htmlFor="auto-context">
+                Additional Context (Optional)
+              </Label>
+              <Textarea
                 id="auto-context"
-              value={autoGenerateInput}
-              onChange={e => setAutoGenerateInput(e.target.value)}
+                value={autoGenerateInput}
+                onChange={(e) => setAutoGenerateInput(e.target.value)}
                 placeholder="Provide any specific requirements or context for question generation..."
-              rows={4}
-            />
+                rows={4}
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAutoGenerateOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAutoGenerateOpen(false)}
+            >
               Cancel
             </Button>
-            <Button className="bg-sylvia-600 hover:bg-sylvia-700" onClick={handleAIGenerate}>
+            <Button
+              className="bg-sylvia-600 hover:bg-sylvia-700"
+              onClick={handleAIGenerate}
+            >
               <Sparkles className="mr-2 h-4 w-4" />
               Generate Questions
             </Button>
@@ -1252,20 +1465,27 @@ export default function QuestionSetPage() {
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
             <div className="text-lg font-semibold text-sylvia-700 text-center min-h-[48px]">
-              {[
-                "Scouring the web for the latest research...",
-                "Analyzing articles and extracting insights...",
-                "Synthesizing survey questions...",
-                "Finalizing your custom question set..."
-              ][aiLoadingStep]}
+              {
+                [
+                  "Scouring the web for the latest research...",
+                  "Analyzing articles and extracting insights...",
+                  "Synthesizing survey questions...",
+                  "Finalizing your custom question set...",
+                ][aiLoadingStep]
+              }
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-sylvia-600 h-2 rounded-full transition-all duration-500" style={{ width: `${(aiLoadingStep + 1) * 25}%` }} />
+              <div
+                className="bg-sylvia-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${(aiLoadingStep + 1) * 25}%` }}
+              />
             </div>
-            <div className="text-xs text-gray-400 mt-2">Sylvia AI is researching and generating your questions...</div>
+            <div className="text-xs text-gray-400 mt-2">
+              Sylvia AI is researching and generating your questions...
+            </div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

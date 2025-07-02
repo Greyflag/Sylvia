@@ -1,9 +1,15 @@
-"use client"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+"use client";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Building,
   ChevronLeft,
@@ -18,19 +24,27 @@ import {
   User,
   UserCircle,
   Zap,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { useProject } from "@/components/project-context"
-import { getResponseById } from "@/lib/data-service"
-import { useState, useEffect } from "react"
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { useProject } from "@/components/project-context";
+import { getResponseById } from "@/lib/data-service";
+import { useState, useEffect } from "react";
 
 // Component to render different types of answers
-const AnswerDisplay = ({ answer, type, scale }: { answer: any; type: string; scale?: number }) => {
+const AnswerDisplay = ({
+  answer,
+  type,
+  scale,
+}: {
+  answer: any;
+  type: string;
+  scale?: number;
+}) => {
   if (type === "multiple-choice") {
-    return <p>{answer}</p>
+    return <p>{answer}</p>;
   }
 
   if (type === "checkbox" && Array.isArray(answer)) {
@@ -40,98 +54,118 @@ const AnswerDisplay = ({ answer, type, scale }: { answer: any; type: string; sca
           <li key={i}>{item}</li>
         ))}
       </ul>
-    )
+    );
   }
 
   if (type === "rating" && typeof answer === "number" && scale) {
     return (
       <div className="flex items-center gap-1">
         {Array.from({ length: scale }).map((_, i) => (
-          <Star key={i} className={`h-5 w-5 ${i < answer ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
+          <Star
+            key={i}
+            className={`h-5 w-5 ${i < answer ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+          />
         ))}
         <span className="ml-2 text-sm font-medium">
           {answer} of {scale}
         </span>
       </div>
-    )
+    );
   }
 
   if (type === "nps" && typeof answer === "number" && scale) {
     const getColor = (score: number) => {
-      if (score >= 9) return "text-green-600 bg-green-50 border-green-200"
-      if (score >= 7) return "text-yellow-600 bg-yellow-50 border-yellow-200"
-      return "text-red-600 bg-red-50 border-red-200"
-    }
+      if (score >= 9) return "text-green-600 bg-green-50 border-green-200";
+      if (score >= 7) return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      return "text-red-600 bg-red-50 border-red-200";
+    };
 
     return (
       <div className="flex items-center gap-2">
-        <Badge className={`${getColor(answer)} font-bold text-base px-3 py-1`}>{answer}</Badge>
-        <span className="text-sm">{answer >= 9 ? "Promoter" : answer >= 7 ? "Passive" : "Detractor"}</span>
+        <Badge className={`${getColor(answer)} font-bold text-base px-3 py-1`}>
+          {answer}
+        </Badge>
+        <span className="text-sm">
+          {answer >= 9 ? "Promoter" : answer >= 7 ? "Passive" : "Detractor"}
+        </span>
       </div>
-    )
+    );
   }
 
   if (type === "open-ended") {
-    return <div className="bg-white/50 p-3 rounded-md border text-sm">{answer}</div>
+    return (
+      <div className="bg-white/50 p-3 rounded-md border text-sm">{answer}</div>
+    );
   }
 
-  return <p>{JSON.stringify(answer)}</p>
-}
+  return <p>{JSON.stringify(answer)}</p>;
+};
 
 export default function ResponderDetailPage() {
-  const params = useParams()
-  const responderId = params.id as string
-  const projectId = params.projectId as string
-  const { currentProject } = useProject()
-  const [responder, setResponder] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const params = useParams();
+  const responderId = params.id as string;
+  const projectId = params.projectId as string;
+  const { currentProject } = useProject();
+  const [responder, setResponder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Load responder data
     if (responderId) {
-      const responderData = getResponseById(responderId)
-      setResponder(responderData)
-      setLoading(false)
+      const responderData = getResponseById(responderId);
+      setResponder(responderData);
+      setLoading(false);
     }
-  }, [responderId])
+  }, [responderId]);
 
   // If current project isn't loaded yet, show a loading state
   if (!currentProject || loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   // If responder not found, show error
   if (!responder) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh]">
-        <h1 className="text-2xl font-bold text-gray-800">Respondent Not Found</h1>
-        <p className="text-gray-600 mt-2">The responder you're looking for doesn't exist or has been removed.</p>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Respondent Not Found
+        </h1>
+        <p className="text-gray-600 mt-2">
+          The responder you're looking for doesn't exist or has been removed.
+        </p>
         <Button asChild className="mt-4 bg-sylvia-600 hover:bg-sylvia-700">
-          <Link href={`/projects/${projectId}/outreach-campaign`}>Return to Campaign</Link>
+          <Link href={`/projects/${projectId}/outreach-campaign`}>
+            Return to Campaign
+          </Link>
         </Button>
       </div>
-    )
+    );
   }
 
   // Group answers by section
-  const sectionAnswers: Record<string, any[]> = {}
+  const sectionAnswers: Record<string, any[]> = {};
   responder.answers.forEach((answer: any) => {
     if (!sectionAnswers[answer.section]) {
-      sectionAnswers[answer.section] = []
+      sectionAnswers[answer.section] = [];
     }
-    sectionAnswers[answer.section].push(answer)
-  })
+    sectionAnswers[answer.section].push(answer);
+  });
 
-  const sections = Object.keys(sectionAnswers)
+  const sections = Object.keys(sectionAnswers);
 
   // For completed surveys, calculate custom metrics
   const metrics =
     responder.status === "completed"
       ? {
           completionTime: "7 minutes 14 seconds",
-          npsScore: responder.answers.find((a: any) => a.type === "nps")?.answer || 0,
-          satisfactionScore: responder.answers.find((a: any) => a.questionId === "q6")?.answer || 0,
-          completionDate: new Date(responder.completedAt as string).toLocaleDateString("en-US", {
+          npsScore:
+            responder.answers.find((a: any) => a.type === "nps")?.answer || 0,
+          satisfactionScore:
+            responder.answers.find((a: any) => a.questionId === "q6")?.answer ||
+            0,
+          completionDate: new Date(
+            responder.completedAt as string,
+          ).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -139,7 +173,7 @@ export default function ResponderDetailPage() {
             minute: "2-digit",
           }),
         }
-      : null
+      : null;
 
   return (
     <div className="space-y-6">
@@ -192,7 +226,9 @@ export default function ResponderDetailPage() {
                 <div className="text-xs text-gray-500 flex items-center">
                   <Clock className="h-3.5 w-3.5 mr-1" />
                   {responder.completedAt
-                    ? `Completed ${new Date(responder.completedAt).toLocaleDateString("en-US", {
+                    ? `Completed ${new Date(
+                        responder.completedAt,
+                      ).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                       })}`
@@ -205,7 +241,9 @@ export default function ResponderDetailPage() {
             <CardContent>
               <div className="flex flex-col items-center text-center">
                 <Avatar className="h-20 w-20 mb-4">
-                  <AvatarFallback className="text-xl bg-sylvia-100 text-sylvia-700">{responder.avatar}</AvatarFallback>
+                  <AvatarFallback className="text-xl bg-sylvia-100 text-sylvia-700">
+                    {responder.avatar}
+                  </AvatarFallback>
                 </Avatar>
                 <h2 className="text-xl font-bold">{responder.name}</h2>
                 <p className="text-gray-500">
@@ -226,20 +264,26 @@ export default function ResponderDetailPage() {
                     <div className="text-left">
                       <div>{responder.company}</div>
                       {responder.demographics.companySize && (
-                        <div className="text-xs text-gray-500">{responder.demographics.companySize}</div>
+                        <div className="text-xs text-gray-500">
+                          {responder.demographics.companySize}
+                        </div>
                       )}
                     </div>
                   </div>
                   {responder.demographics.industry && (
                     <div className="flex items-start gap-3 text-sm">
                       <FileText className="h-4 w-4 text-sylvia-600 mt-0.5" />
-                      <span className="text-left">{responder.demographics.industry}</span>
+                      <span className="text-left">
+                        {responder.demographics.industry}
+                      </span>
                     </div>
                   )}
                   {responder.demographics.role && (
                     <div className="flex items-start gap-3 text-sm">
                       <UserCircle className="h-4 w-4 text-sylvia-600 mt-0.5" />
-                      <span className="text-left">{responder.demographics.role}</span>
+                      <span className="text-left">
+                        {responder.demographics.role}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -279,13 +323,19 @@ export default function ResponderDetailPage() {
                       {metrics.npsScore}/10
                     </Badge>
                     <span className="text-xs ml-2">
-                      {metrics.npsScore >= 9 ? "Promoter" : metrics.npsScore >= 7 ? "Passive" : "Detractor"}
+                      {metrics.npsScore >= 9
+                        ? "Promoter"
+                        : metrics.npsScore >= 7
+                          ? "Passive"
+                          : "Detractor"}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-xs text-gray-500">Satisfaction Score</div>
+                  <div className="text-xs text-gray-500">
+                    Satisfaction Score
+                  </div>
                   <div className="flex items-center">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
@@ -293,7 +343,9 @@ export default function ResponderDetailPage() {
                         className={`h-4 w-4 ${i < metrics.satisfactionScore ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
                       />
                     ))}
-                    <span className="text-xs ml-2">{metrics.satisfactionScore}/5</span>
+                    <span className="text-xs ml-2">
+                      {metrics.satisfactionScore}/5
+                    </span>
                   </div>
                 </div>
 
@@ -319,9 +371,14 @@ export default function ResponderDetailPage() {
                     <span>Progress</span>
                     <span className="font-medium">{responder.progress}%</span>
                   </div>
-                  <Progress value={responder.progress} className="h-2" indicatorClassName="bg-sylvia-600" />
+                  <Progress
+                    value={responder.progress}
+                    className="h-2"
+                    indicatorClassName="bg-sylvia-600"
+                  />
                   <p className="text-xs text-muted-foreground">
-                    Respondent has completed {responder.answers.length} of 10 questions
+                    Respondent has completed {responder.answers.length} of 10
+                    questions
                   </p>
                   <div className="p-3 bg-yellow-50 text-yellow-800 text-sm rounded border border-yellow-200">
                     <p className="flex items-center">
@@ -346,7 +403,9 @@ export default function ResponderDetailPage() {
                 <div className="p-4 text-center">
                   <Mail className="h-12 w-12 mx-auto mb-3 text-gray-400" />
                   <h3 className="font-medium mb-1">Survey Sent</h3>
-                  <p className="text-sm text-gray-500 mb-4">This participant has not yet started the survey</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    This participant has not yet started the survey
+                  </p>
                   <Button className="w-full bg-sylvia-600 hover:bg-sylvia-700">
                     <Mail className="mr-2 h-4 w-4" />
                     Send Reminder
@@ -376,8 +435,8 @@ export default function ResponderDetailPage() {
                   <FileText className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                   <h3 className="text-xl font-medium mb-2">No Responses Yet</h3>
                   <p className="text-gray-500 max-w-md mx-auto mb-6">
-                    This participant has not yet started the survey. You can send a reminder to encourage them to
-                    complete it.
+                    This participant has not yet started the survey. You can
+                    send a reminder to encourage them to complete it.
                   </p>
                   <Button className="bg-sylvia-600 hover:bg-sylvia-700">
                     <Mail className="mr-2 h-4 w-4" />
@@ -395,12 +454,27 @@ export default function ResponderDetailPage() {
                   </TabsList>
 
                   {sections.map((section) => (
-                    <TabsContent key={section} value={section} className="space-y-4">
+                    <TabsContent
+                      key={section}
+                      value={section}
+                      className="space-y-4"
+                    >
                       {sectionAnswers[section].map((answer, index) => (
-                        <div key={answer.questionId} className="p-4 bg-white/80 rounded-lg border">
-                          <div className="text-sm text-gray-500 mb-1">Question {answer.questionId}</div>
-                          <h3 className="font-medium mb-3">{answer.question}</h3>
-                          <AnswerDisplay answer={answer.answer} type={answer.type} scale={answer.scale} />
+                        <div
+                          key={answer.questionId}
+                          className="p-4 bg-white/80 rounded-lg border"
+                        >
+                          <div className="text-sm text-gray-500 mb-1">
+                            Question {answer.questionId}
+                          </div>
+                          <h3 className="font-medium mb-3">
+                            {answer.question}
+                          </h3>
+                          <AnswerDisplay
+                            answer={answer.answer}
+                            type={answer.type}
+                            scale={answer.scale}
+                          />
                         </div>
                       ))}
                     </TabsContent>
@@ -421,14 +495,17 @@ export default function ResponderDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="p-4 bg-sylvia-50 rounded-lg border border-sylvia-200">
-                  <h3 className="font-medium mb-3 text-sylvia-700">Key Insights from {responder.name}'s Responses</h3>
+                  <h3 className="font-medium mb-3 text-sylvia-700">
+                    Key Insights from {responder.name}'s Responses
+                  </h3>
                   <div className="space-y-3">
                     <div className="flex gap-2">
                       <div className="min-w-[20px] flex items-center justify-center">
                         <div className="w-2 h-2 rounded-full bg-sylvia-600"></div>
                       </div>
                       <p className="text-sm">
-                        High NPS score (9/10) indicates strong product satisfaction and likelihood to recommend.
+                        High NPS score (9/10) indicates strong product
+                        satisfaction and likelihood to recommend.
                       </p>
                     </div>
 
@@ -437,7 +514,8 @@ export default function ResponderDetailPage() {
                         <div className="w-2 h-2 rounded-full bg-sylvia-600"></div>
                       </div>
                       <p className="text-sm">
-                        Values the analytics dashboard features most highly, particularly for business insights.
+                        Values the analytics dashboard features most highly,
+                        particularly for business insights.
                       </p>
                     </div>
 
@@ -446,8 +524,8 @@ export default function ResponderDetailPage() {
                         <div className="w-2 h-2 rounded-full bg-sylvia-600"></div>
                       </div>
                       <p className="text-sm">
-                        Identified API documentation as an area for improvement, suggesting enhanced developer
-                        resources.
+                        Identified API documentation as an area for improvement,
+                        suggesting enhanced developer resources.
                       </p>
                     </div>
 
@@ -456,26 +534,30 @@ export default function ResponderDetailPage() {
                         <div className="w-2 h-2 rounded-full bg-sylvia-600"></div>
                       </div>
                       <p className="text-sm">
-                        As a C-level executive at a mid-sized tech company, represents a key decision-maker demographic.
+                        As a C-level executive at a mid-sized tech company,
+                        represents a key decision-maker demographic.
                       </p>
                     </div>
                   </div>
 
                   <Separator className="my-4" />
 
-                  <h4 className="font-medium mb-2 text-sylvia-700">Recommended Follow-up Actions</h4>
+                  <h4 className="font-medium mb-2 text-sylvia-700">
+                    Recommended Follow-up Actions
+                  </h4>
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <User className="h-4 w-4 text-sylvia-600 mt-0.5" />
                       <p className="text-sm">
-                        Schedule a follow-up call to discuss API documentation improvements and gather more specific
-                        feedback.
+                        Schedule a follow-up call to discuss API documentation
+                        improvements and gather more specific feedback.
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <Mail className="h-4 w-4 text-sylvia-600 mt-0.5" />
                       <p className="text-sm">
-                        Send a personalized thank you email acknowledging their detailed feedback.
+                        Send a personalized thank you email acknowledging their
+                        detailed feedback.
                       </p>
                     </div>
                   </div>
@@ -486,5 +568,5 @@ export default function ResponderDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

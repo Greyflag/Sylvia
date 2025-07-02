@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { usePathname, useParams } from "next/navigation"
-import Link from "next/link"
-import { Bell, Menu, Settings, Zap } from "lucide-react"
-import { useProject } from "@/components/project-context"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Sidebar } from "./sidebar"
+import { Button } from "@/components/ui/button";
+import { usePathname, useParams } from "next/navigation";
+import Link from "next/link";
+import { Bell, Menu, Settings, Zap } from "lucide-react";
+import { useProject } from "@/components/project-context";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sidebar } from "./sidebar";
 
 export function Header() {
-  const pathname = usePathname()
-  const params = useParams()
-  const { currentProject, isHydrated } = useProject()
-  const projectId = params.projectId as string
+  const pathname = usePathname();
+  const params = useParams();
+  const { currentProject, isHydrated } = useProject();
+  const projectId = params.projectId as string;
 
   // Wait for hydration to complete
   if (!isHydrated) {
@@ -34,28 +34,34 @@ export function Header() {
           </div>
         </div>
       </header>
-    )
+    );
   }
 
   // Determine if we're in a project view
-  const isProjectView = !!projectId && !!currentProject
+  const isProjectView = !!projectId && !!currentProject;
 
   // Define page titles based on pathname
   const getPageTitle = () => {
     if (!isProjectView) {
-      return pathname === "/" ? "Projects Dashboard" : "Sylvia VOC Platform"
+      return pathname === "/" ? "Projects Dashboard" : "Sylvia VOC Platform";
     }
 
     // Project specific paths
-    if (pathname === `/projects/${projectId}/objectives`) return "Define Objectives"
-    if (pathname === `/projects/${projectId}/question-set`) return "Question Set Generation"
-    if (pathname === `/projects/${projectId}/contacts`) return "Contact List Management"
-    if (pathname === `/projects/${projectId}/outreach-material`) return "Outreach Material"
-    if (pathname.startsWith(`/projects/${projectId}/outreach-campaign`)) return "Outreach Campaign"
-    if (pathname === `/projects/${projectId}/analytics`) return "Analytics & Reporting"
+    if (pathname === `/projects/${projectId}/objectives`)
+      return "Define Objectives";
+    if (pathname === `/projects/${projectId}/question-set`)
+      return "Question Set Generation";
+    if (pathname === `/projects/${projectId}/contacts`)
+      return "Contact List Management";
+    if (pathname === `/projects/${projectId}/outreach-material`)
+      return "Outreach Material";
+    if (pathname.startsWith(`/projects/${projectId}/outreach-campaign`))
+      return "Outreach Campaign";
+    if (pathname === `/projects/${projectId}/analytics`)
+      return "Analytics & Reporting";
 
-    return currentProject?.name || "Sylvia VOC Platform"
-  }
+    return currentProject?.name || "Sylvia VOC Platform";
+  };
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center px-6 border-b bg-white/80 backdrop-blur-sm">
@@ -94,13 +100,22 @@ export function Header() {
 
       <div className="ml-auto flex items-center gap-4">
         <nav className="hidden lg:flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium hover:text-sylvia-600 transition-colors">
+          <Link
+            href="/"
+            className="text-sm font-medium hover:text-sylvia-600 transition-colors"
+          >
             Projects
           </Link>
-          <Link href="/about" className="text-sm font-medium hover:text-sylvia-600 transition-colors">
+          <Link
+            href="/about"
+            className="text-sm font-medium hover:text-sylvia-600 transition-colors"
+          >
             About
           </Link>
-          <Link href="/contact" className="text-sm font-medium hover:text-sylvia-600 transition-colors">
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:text-sylvia-600 transition-colors"
+          >
             Contact
           </Link>
         </nav>
@@ -118,5 +133,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
